@@ -35,3 +35,13 @@ create table if not exists waste_entries
     user_id   integer          not null
 );
         """)
+        await conn.execute("""
+create table if not exists users
+(
+    id            serial primary key,
+    username      varchar(150) not null unique,
+    email         varchar(255) not null unique,
+    role          varchar(60)  not null,
+    password_hash varchar(60)  not null
+);
+        """)

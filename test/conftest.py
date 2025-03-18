@@ -14,7 +14,7 @@ load_dotenv(dotenv_path=".env.test")
 async def drop_tables(pool: asyncpg.Pool):
     async with pool.acquire() as conn:
         conn: asyncpg.Connection = conn
-        for table in ["waste_entries"]:
+        for table in ["waste_entries", "users"]:
             await conn.execute(f"drop table if exists {table}; ")
 
 
