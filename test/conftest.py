@@ -2,15 +2,15 @@
 
 import os
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+from typing import AsyncIterator, List, Optional
 from unittest.mock import patch
 
 import asyncpg
 import pytest
 from dotenv import load_dotenv
 
+from app.models.teams import Team
 from app.repositories.team_repository import AbstractTeamRepository
-from app.repositories.team_service import FakeTeamRepository
 from app.utils.db import initdb
 
 # Load environment variables from a .env file
@@ -46,6 +46,28 @@ def patch_get_db_pool(db_test_pool):
     """Patch the get_db_pool function to return the test pool."""
     with patch("app.services.team_service.get_db_pool", return_value=db_test_pool):
         yield
+
+
+# TODO improve with hashmap
+class FakeTeamRepository(AbstractTeamRepository):
+    def __init__(self, _):
+        self.teams = []
+        self.next_id = 1
+
+    async def create(self, team: Team) -> Team:
+        team.id = self.next_id
+        self.next_id += 1
+        self.teams.append(team)
+        return team
+
+    async def read(self, team_id: int) -> Optional[Team]:
+        for team in self.teams:
+            if team.id == team_id:
+                return team
+        return None
+
+    async def delete(self, team_id: int) -> None:
+        self.teams = [team for team in self.teams if team.id != team_id]
 
 
 @pytest.fixture

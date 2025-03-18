@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
-from typing import List, Optional
+from abc import abstractmethod
+from typing import Optional
 
 from app.models.waste import WasteEntry
 from app.repositories import Repository
@@ -11,17 +11,17 @@ class AbstractWasteRepository(Repository):
     @abstractmethod
     async def create(self, waste_entry: WasteEntry) -> WasteEntry:
         """Create a new waste entry."""
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     async def read(self, entry_id: int) -> Optional[WasteEntry]:
         """Read a waste entry by its ID."""
-        raise NotImplemented
+        raise NotImplementedError
 
     @abstractmethod
     async def delete(self, entry_id: int) -> None:
         """Delete a waste entry by its ID."""
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class WasteRepository(AbstractWasteRepository):

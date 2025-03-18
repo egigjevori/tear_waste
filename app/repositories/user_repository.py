@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
-from typing import List, Optional
+from abc import abstractmethod
+from typing import Optional
 
 from app.models.users import User, UserRole
 from app.repositories import Repository

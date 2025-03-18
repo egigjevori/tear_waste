@@ -1,9 +1,8 @@
-from fastapi import Body, HTTPException
+from fastapi import Body
 from starlette import status
 from starlette.responses import JSONResponse
 
 from app.main import app
-from app.models.teams import Team
 from app.services import team_service
 
 

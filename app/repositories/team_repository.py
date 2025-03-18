@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
-from typing import List, Optional
+from abc import abstractmethod
+
 
 from app.models.teams import Team  # Assuming you have a Team model defined
 from app.repositories import Repository

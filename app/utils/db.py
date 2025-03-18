@@ -32,7 +32,6 @@ async def disconnect():
 
 async def initdb(pool: asyncpg.Pool):
     async with pool.acquire() as conn:
-        conn: asyncpg.Connection = conn
         await conn.execute(
             """
             create table if not exists waste_entries
@@ -79,23 +78,23 @@ def get_db_pool() -> asyncpg.pool.Pool:
 async def execute_query(conn: asyncpg.Connection, query: str, *args):
     try:
         # Execute the query using asyncpg
-        return await conn._execute(query, *args)
-    except UniqueViolationError as e:
+        return await conn._execute(query, *args)  # type: ignore
+    except UniqueViolationError as _:
         # logger.error(f"Unique violation error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="Unique constraint violated"
         )
-    except ForeignKeyViolationError as e:
+    except ForeignKeyViolationError as _:
         # logger.error(f"Foreign key violation error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Referenced entity not found"
         )
-    except PostgresSyntaxError as e:
+    except PostgresSyntaxError as _:
         # logger.error(f"SQL Syntax error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="SQL syntax error"
         )
-    except Exception as e:
+    except Exception as _:
         # logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
