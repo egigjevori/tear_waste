@@ -1,5 +1,6 @@
-import pytest
 import asyncpg
+import pytest
+
 from app.models.teams import Team
 from app.repositories.team_repository import TeamRepository
 

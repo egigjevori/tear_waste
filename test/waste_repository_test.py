@@ -1,6 +1,7 @@
+from datetime import datetime
+
 import asyncpg
 
-from datetime import datetime
 from app.models.waste import WasteEntry
 from app.repositories.waste_repository import WasteRepository
 

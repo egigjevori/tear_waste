@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from app.models.teams import Team
 from app.repositories.team_service import FakeTeamRepository
 from app.services.team_service import create_team

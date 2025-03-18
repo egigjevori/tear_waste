@@ -1,9 +1,9 @@
-from app.repositories import Repository
-
 from abc import ABC, abstractmethod
 from typing import List, Optional
+
 from app.models.users import User, UserRole
-from app.utils.db import fetchrow, execute_query
+from app.repositories import Repository
+from app.utils.db import execute_query, fetchrow
 
 
 class AbstractUserRepository(Repository):

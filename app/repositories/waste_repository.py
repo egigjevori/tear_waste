@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
+
 from app.models.waste import WasteEntry
 from app.repositories import Repository
-from app.utils.db import fetchrow, execute_query
+from app.utils.db import execute_query, fetchrow
 
 
 class AbstractWasteRepository(Repository):

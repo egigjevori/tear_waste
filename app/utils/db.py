@@ -1,7 +1,8 @@
 import os
 
 import asyncpg
-from asyncpg import UniqueViolationError, ForeignKeyViolationError, PostgresSyntaxError
+from asyncpg import (ForeignKeyViolationError, PostgresSyntaxError,
+                     UniqueViolationError)
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from starlette import status

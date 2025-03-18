@@ -5,8 +5,8 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 from unittest.mock import patch
 
-import pytest
 import asyncpg
+import pytest
 from dotenv import load_dotenv
 
 from app.repositories.team_repository import AbstractTeamRepository
