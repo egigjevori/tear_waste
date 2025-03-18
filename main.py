@@ -9,8 +9,8 @@ from app.utils import db
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    await db.connect()
-    await db.initdb()
+    pool = await db.connect()
+    await db.initdb(pool)
     yield
     await db.disconnect()
 

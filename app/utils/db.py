@@ -13,14 +13,15 @@ DATABASE_URL = (f"postgresql://{os.getenv('POSTGRES_USER')}"
 
 pool: asyncpg.Pool
 
-async def connect():
+async def connect() -> asyncpg.Pool:
     global pool
     pool = await asyncpg.create_pool(DATABASE_URL)
+    return pool
 
 async def disconnect():
     await pool.close()
 
-async def initdb():
+async def initdb(pool: asyncpg.Pool):
     async with pool.acquire() as conn:
         conn: asyncpg.Connection = conn
         await conn.execute("""
@@ -31,7 +32,6 @@ create table if not exists waste_entries
     type      varchar(100)     not null,
     weight    double precision not null,
     timestamp timestamp        not null,
-    user_id   integer          not null,
-    team_id   integer          not null
+    user_id   integer          not null
 );
         """)

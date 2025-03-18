@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 class WasteEntry:
-    def __init__(self, id: int, type: str, weight: float, timestamp: datetime, user_id: int, team_id: int):
+    def __init__(self, type: str, weight: float, user_id: int, id: int | None = None, timestamp: datetime = datetime.now()):
         self.id = id
         self.type = type
         self.weight = weight
