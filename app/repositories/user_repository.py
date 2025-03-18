@@ -26,8 +26,8 @@ class UserRepository(AbstractUserRepository):
 
     async def create(self, user: User) -> User:
         query = """
-        INSERT INTO users (username, email, role, password_hash)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO users (username, email, role, password_hash, team_id)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING id
         """
         row = await self.conn.fetchrow(
@@ -35,7 +35,8 @@ class UserRepository(AbstractUserRepository):
             user.username,
             user.email,
             user.role.value,  # Assuming role is an instance of UserRole enum
-            user.password_hash
+            user.password_hash,
+            user.team_id,
         )
         user.id = row['id']
         return user
@@ -52,6 +53,7 @@ class UserRepository(AbstractUserRepository):
                 id=row['id'],
                 username=row['username'],
                 email=row['email'],
+                team_id=row['team_id'],
                 role=UserRole(row['role']),
                 password_hash=row['password_hash']  # Assuming password_hash is stored directly
             )

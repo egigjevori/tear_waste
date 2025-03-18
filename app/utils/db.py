@@ -42,6 +42,7 @@ create table if not exists users
     username      varchar(150) not null unique,
     email         varchar(255) not null unique,
     role          varchar(60)  not null,
+    team_id   integer          not null,
     password_hash varchar(60)  not null
 );
         """)
