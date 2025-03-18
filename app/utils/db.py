@@ -25,24 +25,31 @@ async def initdb(pool: asyncpg.Pool):
     async with pool.acquire() as conn:
         conn: asyncpg.Connection = conn
         await conn.execute("""
-create table if not exists waste_entries
-(
-    id        serial
-        primary key,
-    type      varchar(100)     not null,
-    weight    double precision not null,
-    timestamp timestamp        not null,
-    user_id   integer          not null
-);
+            create table if not exists waste_entries
+            (
+                id        serial
+                    primary key,
+                type      varchar(100)     not null,
+                weight    double precision not null,
+                timestamp timestamp        not null,
+                user_id   integer          not null
+            );
         """)
         await conn.execute("""
-create table if not exists users
-(
-    id            serial primary key,
-    username      varchar(150) not null unique,
-    email         varchar(255) not null unique,
-    role          varchar(60)  not null,
-    team_id   integer          not null,
-    password_hash varchar(60)  not null
-);
+            create table if not exists users
+            (
+                id            serial primary key,
+                username      varchar(150) not null unique,
+                email         varchar(255) not null unique,
+                role          varchar(60)  not null,
+                team_id   integer          not null,
+                password_hash varchar(60)  not null
+            );
+        """)
+        await conn.execute("""
+            create table if not exists teams
+            (
+                id         serial primary key,
+                name       varchar(100) not null unique
+            );
         """)
