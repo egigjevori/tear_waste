@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 from app.models.waste import WasteEntry
 from app.repositories import Repository
+from app.utils.db import fetchrow, execute_query
 
 
 class AbstractWasteRepository(Repository):
@@ -29,14 +30,15 @@ class WasteRepository(AbstractWasteRepository):
         VALUES ($1, $2, $3, $4)
         RETURNING id
         """
-        row = await self.conn.fetchrow(
+        row = await fetchrow(
+            self.conn,
             query,
             waste_entry.type,
             waste_entry.weight,
             waste_entry.timestamp,
             waste_entry.user_id,
         )
-        waste_entry.id = row['id']
+        waste_entry.id = row["id"]
         return waste_entry
 
     async def read(self, entry_id: int) -> Optional[WasteEntry]:
@@ -45,14 +47,14 @@ class WasteRepository(AbstractWasteRepository):
         FROM waste_entries
         WHERE id = $1
         """
-        row = await self.conn.fetchrow(query, entry_id)
+        row = await fetchrow(self.conn, query, entry_id)
         if row:
             return WasteEntry(
-                id=row['id'],
-                type=row['type'],
-                weight=row['weight'],
-                timestamp=row['timestamp'],
-                user_id=row['user_id'],
+                id=row["id"],
+                type=row["type"],
+                weight=row["weight"],
+                timestamp=row["timestamp"],
+                user_id=row["user_id"],
             )
         return None
 
@@ -61,4 +63,4 @@ class WasteRepository(AbstractWasteRepository):
         DELETE FROM waste_entries
         WHERE id = $1
         """
-        await self.conn.execute(query, entry_id)
+        await execute_query(self.conn, query, entry_id)

@@ -6,5 +6,4 @@ import asyncpg
 class Repository(ABC):
 
     def __init__(self, conn: asyncpg.Connection):
-        self. conn = conn
-
+        self.conn = conn

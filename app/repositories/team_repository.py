@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 from app.models.teams import Team  # Assuming you have a Team model defined
 from app.repositories import Repository
+from app.utils.db import fetchrow
 
 
 class AbstractTeamRepository(Repository):
@@ -18,9 +19,10 @@ class TeamRepository(AbstractTeamRepository):
         VALUES ($1)
         RETURNING id
         """
-        row = await self.conn.fetchrow(
+        row = await fetchrow(
+            self.conn,
             query,
             team.name,
         )
-        team.id = row['id']
+        team.id = row["id"]
         return team

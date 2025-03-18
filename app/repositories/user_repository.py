@@ -3,6 +3,7 @@ from app.repositories import Repository
 from abc import ABC, abstractmethod
 from typing import List, Optional
 from app.models.users import User, UserRole
+from app.utils.db import fetchrow, execute_query
 
 
 class AbstractUserRepository(Repository):
@@ -30,7 +31,8 @@ class UserRepository(AbstractUserRepository):
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id
         """
-        row = await self.conn.fetchrow(
+        row = await fetchrow(
+            self.conn,
             query,
             user.username,
             user.email,
@@ -38,7 +40,7 @@ class UserRepository(AbstractUserRepository):
             user.password_hash,
             user.team_id,
         )
-        user.id = row['id']
+        user.id = row["id"]
         return user
 
     async def read(self, user_id: int) -> Optional[User]:
@@ -47,20 +49,23 @@ class UserRepository(AbstractUserRepository):
         FROM users
         WHERE id = $1
         """
-        row = await self.conn.fetchrow(query, user_id)
+        row = await fetchrow(self.conn, query, user_id)
         if row:
             return User(
-                id=row['id'],
-                username=row['username'],
-                email=row['email'],
-                team_id=row['team_id'],
-                role=UserRole(row['role']),
-                password_hash=row['password_hash']  # Assuming password_hash is stored directly
+                id=row["id"],
+                username=row["username"],
+                email=row["email"],
+                team_id=row["team_id"],
+                role=UserRole(row["role"]),
+                password_hash=row[
+                    "password_hash"
+                ],  # Assuming password_hash is stored directly
             )
         return None
+
     async def delete(self, user_id: int) -> None:
         query = """
         DELETE FROM users
         WHERE id = $1
         """
-        await self.conn.execute(query, user_id)
+        await execute_query(self.conn, query, user_id)

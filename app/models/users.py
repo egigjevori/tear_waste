@@ -13,11 +13,19 @@ class UserRole(enum.Enum):
 
 def _hash_password(password):
     """Hash the user's password."""
-    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 class User:
-    def __init__(self, username: str, email: str, role: UserRole, team_id: int, password_hash: str | None = None, id: int | None = None):
+    def __init__(
+        self,
+        username: str,
+        email: str,
+        role: UserRole,
+        team_id: int,
+        password_hash: str | None = None,
+        id: int | None = None,
+    ):
         self.id = id  # ID would typically be set by the database
         self.username = username
         self.email = email

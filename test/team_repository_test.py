@@ -9,7 +9,7 @@ async def test_create_team(db_test_pool: asyncpg.Pool):
     async with db_test_pool.acquire() as conn:
         repo = TeamRepository(conn)
         team = Team(
-            name='Development Team',
+            name="Development Team",
         )
 
         # Act
@@ -21,7 +21,4 @@ async def test_create_team(db_test_pool: asyncpg.Pool):
         # Verify the team exists in the database
         row = await conn.fetchrow("SELECT * FROM teams WHERE id = $1", created_team.id)
         assert row is not None
-        assert row['name'] == 'Development Team'
-
-        # Clean up (optional, depending on your test setup)
-        await conn.execute("DELETE FROM teams WHERE id = $1", created_team.id)
+        assert row["name"] == "Development Team"

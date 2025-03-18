@@ -5,8 +5,6 @@ from fastapi import FastAPI
 from app.utils import db
 
 
-
-
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     pool = await db.connect()
@@ -16,6 +14,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/")
 async def root():

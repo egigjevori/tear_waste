@@ -4,6 +4,7 @@ from datetime import datetime
 from app.models.waste import WasteEntry
 from app.repositories.waste_repository import WasteRepository
 
+
 async def test_create_waste_entry(db_test_pool: asyncpg.Pool):
     # Arrange
     async with db_test_pool.acquire() as conn:
@@ -22,11 +23,14 @@ async def test_create_waste_entry(db_test_pool: asyncpg.Pool):
         assert created_entry.id is not None
 
         # Verify the entry exists in the database
-        row = await conn.fetchrow("SELECT * FROM waste_entries WHERE id = $1", created_entry.id)
+        row = await conn.fetchrow(
+            "SELECT * FROM waste_entries WHERE id = $1", created_entry.id
+        )
         assert row is not None
-        assert row['type'] == "Plastic"
-        assert row['weight'] == 2.5
-        assert row['user_id'] == 1
+        assert row["type"] == "Plastic"
+        assert row["weight"] == 2.5
+        assert row["user_id"] == 1
+
 
 async def test_read_waste_entry(db_test_pool: asyncpg.Pool):
     # Arrange
@@ -52,6 +56,7 @@ async def test_read_waste_entry(db_test_pool: asyncpg.Pool):
         assert read_entry.weight == 2.5
         assert read_entry.user_id == 1
 
+
 async def test_delete_waste_entry(db_test_pool: asyncpg.Pool):
     # Arrange
     async with db_test_pool.acquire() as conn:
@@ -71,5 +76,7 @@ async def test_delete_waste_entry(db_test_pool: asyncpg.Pool):
 
         # Assert
         # Verify the entry no longer exists in the database
-        row = await conn.fetchrow("SELECT * FROM waste_entries WHERE id = $1", created_entry.id)
+        row = await conn.fetchrow(
+            "SELECT * FROM waste_entries WHERE id = $1", created_entry.id
+        )
         assert row is None
