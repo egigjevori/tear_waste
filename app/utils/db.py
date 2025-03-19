@@ -120,3 +120,13 @@ async def fetchrow(
     logging.info(query)
     data = await conn.fetchrow(query, *args)
     return data
+
+@handle_errors
+async def fetch(
+    conn: asyncpg.Connection,
+    query: str,
+    *args,
+):
+    logging.info(query)
+    data = await conn.fetch(query, *args)
+    return data

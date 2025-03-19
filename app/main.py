@@ -17,6 +17,7 @@ async def lifespan(_: FastAPI):
     await db.disconnect()
 
 
+#TODO global error handling
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(team_router)

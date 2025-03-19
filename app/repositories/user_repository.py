@@ -1,9 +1,9 @@
 from abc import abstractmethod
-from typing import Optional
+from typing import Optional, List
 
 from app.models.users import User, UserRole
 from app.repositories import Repository
-from app.utils.db import execute, fetchrow
+from app.utils.db import execute, fetchrow, fetch
 
 
 class AbstractUserRepository(Repository):
@@ -21,6 +21,12 @@ class AbstractUserRepository(Repository):
     async def delete(self, user_id: int) -> None:
         """Delete a user by their ID."""
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_users_by_team_id(self, team_id: int) -> List[User]:
+        """Get users by their team id."""
+        raise NotImplementedError
+
 
 
 class UserRepository(AbstractUserRepository):
@@ -69,3 +75,23 @@ class UserRepository(AbstractUserRepository):
         WHERE id = $1
         """
         await execute(self.conn, query, user_id)
+
+    async def get_users_by_team_id(self, team_id: int) -> List[User]:
+        query = """
+        SELECT *
+        FROM users
+        WHERE team_id = $1
+        """
+        rows = await fetch(self.conn, query, team_id)
+        users = [
+            User(
+                id=row["id"],
+                username=row["username"],
+                email=row["email"],
+                team_id=row["team_id"],
+                role=UserRole(row["role"]),
+                password_hash=row["password_hash"],
+            )
+            for row in rows
+        ]
+        return users

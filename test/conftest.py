@@ -110,10 +110,10 @@ def team_repo_mock():
         yield mock_repo
 
 
+fake_team_repo = FakeTeamRepository(None)
 @asynccontextmanager
 async def get_team_repo() -> AsyncIterator[AbstractTeamRepository]:
-    repo = FakeTeamRepository(None)
-    yield repo
+    yield fake_team_repo
 
 
 @pytest.fixture
@@ -146,10 +146,14 @@ class FakeUserRepository(AbstractUserRepository):
         if user_id in self.users:
             del self.users[user_id]
 
+    async def get_users_by_team_id(self, team_id: int) -> List[User]:
+        # Filter users by team_id
+        return [user for user in self.users.values() if user.team_id == team_id]
+
+fake_user_repo = FakeUserRepository(None)
 @asynccontextmanager
 async def get_user_repo() -> AsyncIterator[AbstractUserRepository]:
-    repo = FakeUserRepository(None)
-    yield repo
+    yield fake_user_repo
 
 
 @pytest.fixture

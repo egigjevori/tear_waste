@@ -84,3 +84,30 @@ async def test_delete_user(db_test_pool: asyncpg.Pool):
         # Verify the user no longer exists in the database
         row = await conn.fetchrow("SELECT * FROM users WHERE id = $1", created_user.id)
         assert row is None
+
+
+async def test_get_users_by_team_id(db_test_pool: asyncpg.Pool):
+    # Arrange
+    async with db_test_pool.acquire() as conn:
+        repo = UserRepository(conn)
+
+        # Create multiple users with the same team_id
+        user1 = create_test_user()
+        user2 = create_test_user()
+        user2.username = "testuser2"
+        user2.email = "testuser2@example.com"
+
+        created_user1 = await repo.create(user1)
+        created_user2 = await repo.create(user2)
+
+        # Act
+        users = await repo.get_users_by_team_id(user1.team_id)
+
+        # Assert
+        assert len(users) == 2
+        assert any(u.id == created_user1.id for u in users)
+        assert any(u.id == created_user2.id for u in users)
+
+        # Test with a team_id that has no users
+        users = await repo.get_users_by_team_id(9999)  # Assuming 9999 is a non-existent team_id
+        assert len(users) == 0

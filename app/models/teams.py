@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 
+
+@dataclass
 class Team:
     def __init__(self, name: str, id: int | None = None):
         self.name = name
