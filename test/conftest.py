@@ -188,6 +188,9 @@ class FakeWasteRepository(AbstractWasteRepository):
         if entry_id in self.entries:
             del self.entries[entry_id]
 
+    async def get_waste_by_user_id(self, user_id: int) -> List[WasteEntry]:
+        pass
+
 
 @asynccontextmanager
 async def get_waste_repo() -> AsyncIterator[AbstractWasteRepository]:

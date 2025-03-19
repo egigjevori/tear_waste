@@ -1,9 +1,9 @@
 from abc import abstractmethod
-from typing import Optional
+from typing import Optional, List
 
 from app.models.waste import WasteEntry
 from app.repositories import Repository
-from app.utils.db import execute, fetchrow
+from app.utils.db import execute, fetchrow, fetch
 
 
 class AbstractWasteRepository(Repository):
@@ -20,6 +20,11 @@ class AbstractWasteRepository(Repository):
 
     @abstractmethod
     async def delete(self, entry_id: int) -> None:
+        """Delete a waste entry by its ID."""
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_waste_by_user_id(self, user_id: int) -> List[WasteEntry]:
         """Delete a waste entry by its ID."""
         raise NotImplementedError
 
@@ -65,3 +70,22 @@ class WasteRepository(AbstractWasteRepository):
         WHERE id = $1
         """
         await execute(self.conn, query, entry_id)
+
+    async def get_waste_by_user_id(self, user_id: int) -> List[WasteEntry]:
+        query = """
+        SELECT *
+        FROM waste_entries
+        WHERE user_id = $1
+        """
+        rows = await fetch(self.conn, query, user_id)
+        waste_entries = [
+            WasteEntry(
+                id=row["id"],
+                type=row["type"],
+                weight=row["weight"],
+                timestamp=row["timestamp"],
+                user_id=row["user_id"],
+            )
+            for row in rows
+        ]
+        return waste_entries
