@@ -32,6 +32,7 @@ class TeamRepository(AbstractTeamRepository):
         )
         team.id = row["id"]
         return team
+
     async def read(self, team_id: int) -> Optional[Team]:
         query = """
         SELECT *

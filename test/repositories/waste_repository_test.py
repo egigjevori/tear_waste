@@ -24,9 +24,7 @@ async def test_create_waste_entry(db_test_pool: asyncpg.Pool):
         assert created_entry.id is not None
 
         # Verify the entry exists in the database
-        row = await conn.fetchrow(
-            "SELECT * FROM waste_entries WHERE id = $1", created_entry.id
-        )
+        row = await conn.fetchrow("SELECT * FROM waste_entries WHERE id = $1", created_entry.id)
         assert row is not None
         assert row["type"] == "Plastic"
         assert row["weight"] == 2.5
@@ -77,7 +75,5 @@ async def test_delete_waste_entry(db_test_pool: asyncpg.Pool):
 
         # Assert
         # Verify the entry no longer exists in the database
-        row = await conn.fetchrow(
-            "SELECT * FROM waste_entries WHERE id = $1", created_entry.id
-        )
+        row = await conn.fetchrow("SELECT * FROM waste_entries WHERE id = $1", created_entry.id)
         assert row is None

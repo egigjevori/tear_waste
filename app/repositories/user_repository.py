@@ -28,7 +28,6 @@ class AbstractUserRepository(Repository):
         raise NotImplementedError
 
 
-
 class UserRepository(AbstractUserRepository):
 
     async def create(self, user: User) -> User:
@@ -63,9 +62,7 @@ class UserRepository(AbstractUserRepository):
                 email=row["email"],
                 team_id=row["team_id"],
                 role=UserRole(row["role"]),
-                password_hash=row[
-                    "password_hash"
-                ],
+                password_hash=row["password_hash"],
             )
         return None
 

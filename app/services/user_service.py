@@ -14,11 +14,11 @@ async def get_user_repo() -> AsyncIterator[UserRepository]:
 
 
 async def create_user(
-        username: str,
-        email: str,
-        role: str,
-        team_id: int,
-        password: str,
+    username: str,
+    email: str,
+    role: str,
+    team_id: int,
+    password: str,
 ) -> User:
     # TODO validate data
     # TODO check if team exists

@@ -5,9 +5,10 @@ sample_user_data = {
     "email": "testuser@example.com",
     "password": "password",
     "role": "Employee",
-    "team_id": 1
+    "team_id": 1,
 }
 cnt = 0
+
 
 def create_test_user_data() -> dict:
     """Utility function to create a User object with predefined data for testing."""
@@ -17,10 +18,11 @@ def create_test_user_data() -> dict:
         "email": f"{cnt}testuser@example.com",
         "password": "password",
         "role": "Employee",
-        "team_id": 1
+        "team_id": 1,
     }
-    cnt+=1
+    cnt += 1
     return user
+
 
 async def test_create_user(patch_get_db_pool_user_service, client):
     # Send a POST request to the /user endpoint
@@ -44,12 +46,7 @@ async def test_get_users_by_team_id(patch_get_db_pool_user_service, patch_get_db
     assert response.status_code == 200
 
     # Assert that the response body contains the expected message
-    assert response.json() == [{'email': '0testuser@example.com',
-  'role': 'Employee',
-  'team_id': 1,
-  'username': 'testuser0'},
- {'email': '1testuser@example.com',
-  'role': 'Employee',
-  'team_id': 1,
-  'username': 'testuser1'}]
-
+    assert response.json() == [
+        {"email": "0testuser@example.com", "role": "Employee", "team_id": 1, "username": "testuser0"},
+        {"email": "1testuser@example.com", "role": "Employee", "team_id": 1, "username": "testuser1"},
+    ]

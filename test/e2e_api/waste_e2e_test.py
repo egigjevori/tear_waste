@@ -1,11 +1,5 @@
+sample_waste_data = {"type": "trash", "weight": 3.4, "user_id": 1}
 
-
-
-sample_waste_data = {
-    "type": "trash",
-    "weight": 3.4,
-    "user_id": 1
-}
 
 async def test_create_waste(patch_get_db_pool_waste_service, client):
     # Send a POST request to the /user endpoint

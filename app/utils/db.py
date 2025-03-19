@@ -3,8 +3,7 @@ import os
 from functools import wraps
 
 import asyncpg
-from asyncpg import (ForeignKeyViolationError, PostgresSyntaxError,
-                     UniqueViolationError)
+from asyncpg import ForeignKeyViolationError, PostgresSyntaxError, UniqueViolationError
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from starlette import status
@@ -69,7 +68,7 @@ async def initdb(pool: asyncpg.Pool):
             );
         """
         )
-        #TODO add indexes
+        # TODO add indexes
 
 
 def get_db_pool() -> asyncpg.pool.Pool:
@@ -83,19 +82,13 @@ def handle_errors(func):
             result = func(*args, **kwargs)
         except UniqueViolationError as _:
             # logger.error(f"Unique violation error: {str(e)}")
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Unique constraint violated"
-            )
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Unique constraint violated")
         except ForeignKeyViolationError as _:
             # logger.error(f"Foreign key violation error: {str(e)}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Referenced entity not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Referenced entity not found")
         except PostgresSyntaxError as _:
             # logger.error(f"SQL Syntax error: {str(e)}")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="SQL syntax error"
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="SQL syntax error")
         except Exception as _:
             # logger.error(f"Unexpected error: {str(e)}")
             raise HTTPException(
@@ -104,12 +97,15 @@ def handle_errors(func):
             )
 
         return result
+
     return wrapper
+
 
 @handle_errors
 async def execute(conn: asyncpg.Connection, query: str, *args):
     logging.info(query)
     return await conn.execute(query, *args)
+
 
 @handle_errors
 async def fetchrow(
@@ -120,6 +116,7 @@ async def fetchrow(
     logging.info(query)
     data = await conn.fetchrow(query, *args)
     return data
+
 
 @handle_errors
 async def fetch(

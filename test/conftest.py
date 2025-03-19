@@ -23,19 +23,20 @@ from app.utils.db import initdb
 # Load environment variables from a .env file
 load_dotenv(dotenv_path=".env.test")
 
-@pytest.yield_fixture(scope='session')
+
+@pytest.yield_fixture(scope="session")
 def event_loop(request):
     """Create an instance of the default event loop for each test case."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
 
+
 @pytest.fixture
 async def client():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
+
 
 async def drop_tables(pool: asyncpg.Pool):
     async with pool.acquire() as conn:
@@ -67,11 +68,13 @@ def patch_get_db_pool_team_service(db_test_pool):
     with patch("app.services.team_service.get_db_pool", return_value=db_test_pool):
         yield
 
+
 @pytest.fixture
 def patch_get_db_pool_user_service(db_test_pool):
     """Patch the get_db_pool function to return the test pool."""
     with patch("app.services.user_service.get_db_pool", return_value=db_test_pool):
         yield
+
 
 @pytest.fixture
 def patch_get_db_pool_waste_service(db_test_pool):
@@ -104,13 +107,13 @@ class FakeTeamRepository(AbstractTeamRepository):
 
 @pytest.fixture
 def team_repo_mock():
-    with patch(
-        "app.services.team_service.TeamRepository", new=FakeTeamRepository
-    ) as mock_repo:
+    with patch("app.services.team_service.TeamRepository", new=FakeTeamRepository) as mock_repo:
         yield mock_repo
 
 
 fake_team_repo = FakeTeamRepository(None)
+
+
 @asynccontextmanager
 async def get_team_repo() -> AsyncIterator[AbstractTeamRepository]:
     yield fake_team_repo
@@ -118,9 +121,7 @@ async def get_team_repo() -> AsyncIterator[AbstractTeamRepository]:
 
 @pytest.fixture
 def get_team_repo_mock():
-    with patch(
-        "app.services.team_service.get_team_repo", wraps=get_team_repo
-    ) as mock_repo:
+    with patch("app.services.team_service.get_team_repo", wraps=get_team_repo) as mock_repo:
         yield mock_repo
 
 
@@ -150,7 +151,10 @@ class FakeUserRepository(AbstractUserRepository):
         # Filter users by team_id
         return [user for user in self.users.values() if user.team_id == team_id]
 
+
 fake_user_repo = FakeUserRepository(None)
+
+
 @asynccontextmanager
 async def get_user_repo() -> AsyncIterator[AbstractUserRepository]:
     yield fake_user_repo
@@ -158,9 +162,7 @@ async def get_user_repo() -> AsyncIterator[AbstractUserRepository]:
 
 @pytest.fixture
 def get_user_repo_mock():
-    with patch(
-        "app.services.user_service.get_user_repo", wraps=get_user_repo
-    ) as mock_repo:
+    with patch("app.services.user_service.get_user_repo", wraps=get_user_repo) as mock_repo:
         yield mock_repo
 
 
@@ -195,8 +197,5 @@ async def get_waste_repo() -> AsyncIterator[AbstractWasteRepository]:
 
 @pytest.fixture
 def get_waste_repo_mock():
-    with patch(
-        "app.services.waste_service.get_waste_repo", wraps=get_waste_repo
-    ) as mock_repo:
+    with patch("app.services.waste_service.get_waste_repo", wraps=get_waste_repo) as mock_repo:
         yield mock_repo
-

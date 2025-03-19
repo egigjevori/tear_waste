@@ -5,8 +5,10 @@ sample_user_data = {
     "email": "testuser@example.com",
     "password": "password",
     "role": "Employee",
-    "team_id": 1
+    "team_id": 1,
 }
+
+
 async def test_create_user_success(get_user_repo_mock):
 
     # Sample user data for testing
@@ -19,6 +21,7 @@ async def test_create_user_success(get_user_repo_mock):
     assert created_user.username == sample_user_data["username"]
     assert created_user.email == sample_user_data["email"]
 
+
 async def test_delete(get_user_repo_mock):
 
     # Sample user data for testing
@@ -27,6 +30,7 @@ async def test_delete(get_user_repo_mock):
     created_user = await create_user(**sample_user_data)
 
     await delete_user(created_user.id)
+
 
 async def test_get(get_user_repo_mock):
 

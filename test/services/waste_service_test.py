@@ -1,11 +1,9 @@
 from app.services.user_service import create_user
 from app.services.waste_service import create_waste
 
-sample_waste_data = {
-    "type": "trash",
-    "weight": 3.4,
-    "user_id": 1
-}
+sample_waste_data = {"type": "trash", "weight": 3.4, "user_id": 1}
+
+
 async def test_create_waste_success(get_waste_repo_mock):
 
     # Sample user data for testing

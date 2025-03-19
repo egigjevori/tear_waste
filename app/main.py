@@ -17,17 +17,18 @@ async def lifespan(_: FastAPI):
     await db.disconnect()
 
 
-#TODO global error handling
+# TODO global error handling
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(team_router)
 app.include_router(user_router)
 app.include_router(waste_router)
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)

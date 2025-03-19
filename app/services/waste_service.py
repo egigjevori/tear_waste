@@ -15,9 +15,9 @@ async def get_waste_repo() -> AsyncIterator[WasteRepository]:
 
 
 async def create_waste(
-        type: str,
-        weight: float,
-        user_id: int,
+    type: str,
+    weight: float,
+    user_id: int,
 ) -> WasteEntry:
     # TODO validate data
     waste = WasteEntry(
