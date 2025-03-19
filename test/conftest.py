@@ -3,7 +3,7 @@ import asyncio
 import os
 from asyncio import AbstractEventLoop
 from contextlib import asynccontextmanager
-from typing import AsyncIterator, List, Optional, Iterator
+from typing import AsyncIterator, List, Optional, Iterator, Dict
 from unittest.mock import patch
 
 import asyncpg
@@ -13,7 +13,9 @@ from httpx import AsyncClient, ASGITransport
 
 from app.main import app
 from app.models.teams import Team
+from app.models.users import User
 from app.repositories.team_repository import AbstractTeamRepository
+from app.repositories.user_repository import AbstractUserRepository
 from app.utils.db import initdb
 
 # Load environment variables from a .env file
@@ -58,9 +60,15 @@ async def db_test_pool() -> asyncpg.Pool:
 
 
 @pytest.fixture
-def patch_get_db_pool(db_test_pool):
+def patch_get_db_pool_team_service(db_test_pool):
     """Patch the get_db_pool function to return the test pool."""
     with patch("app.services.team_service.get_db_pool", return_value=db_test_pool):
+        yield
+
+@pytest.fixture
+def patch_get_db_pool_user_service(db_test_pool):
+    """Patch the get_db_pool function to return the test pool."""
+    with patch("app.services.user_service.get_db_pool", return_value=db_test_pool):
         yield
 
 
@@ -104,5 +112,41 @@ async def get_team_repo() -> AsyncIterator[AbstractTeamRepository]:
 def get_team_repo_mock():
     with patch(
         "app.services.team_service.get_team_repo", wraps=get_team_repo
+    ) as mock_repo:
+        yield mock_repo
+
+
+class FakeUserRepository(AbstractUserRepository):
+    def __init__(self, _):
+        # In-memory storage for users
+        self.users: Dict[int, User] = {}
+        self.current_id = 1
+
+    async def create(self, user: User) -> User:
+        # Assign a new ID to the user and store it in the dictionary
+        user.id = self.current_id
+        self.users[self.current_id] = user
+        self.current_id += 1
+        return user
+
+    async def read(self, user_id: int) -> Optional[User]:
+        # Retrieve the user by ID from the dictionary
+        return self.users.get(user_id)
+
+    async def delete(self, user_id: int) -> None:
+        # Remove the user from the dictionary
+        if user_id in self.users:
+            del self.users[user_id]
+
+@asynccontextmanager
+async def get_user_repo() -> AsyncIterator[AbstractUserRepository]:
+    repo = FakeUserRepository(None)
+    yield repo
+
+
+@pytest.fixture
+def get_user_repo_mock():
+    with patch(
+        "app.services.user_service.get_user_repo", wraps=get_user_repo
     ) as mock_repo:
         yield mock_repo

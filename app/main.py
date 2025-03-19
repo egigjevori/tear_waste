@@ -3,7 +3,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 
-from app.routes.teams import team_router
+from app.routes.team_routes import team_router
+from app.routes.user_routes import user_router
 from app.utils import db
 
 
@@ -18,6 +19,8 @@ async def lifespan(_: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(team_router)
+app.include_router(user_router)
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
