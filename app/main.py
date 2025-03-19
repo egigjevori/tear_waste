@@ -1,8 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
-
+from fastapi import FastAPI, HTTPException, Request
 from app.routes.team_routes import team_router
 from app.routes.user_routes import user_router
 from app.routes.waste_routes import waste_router
@@ -25,6 +24,9 @@ app.include_router(user_router)
 app.include_router(waste_router)
 
 
+@app.exception_handler(ValueError)
+async def value_error_exception_handler(_: Request, exc: ValueError):
+    raise HTTPException(status_code=400, detail=str(exc))
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
