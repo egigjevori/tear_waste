@@ -69,6 +69,7 @@ async def initdb(pool: asyncpg.Pool):
             );
         """
         )
+        #TODO add indexes
 
 
 def get_db_pool() -> asyncpg.pool.Pool:
@@ -118,6 +119,4 @@ async def fetchrow(
 ):
     logging.info(query)
     data = await conn.fetchrow(query, *args)
-    if not data:
-        return None
-    return data[0]
+    return data

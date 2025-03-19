@@ -59,7 +59,7 @@ class UserRepository(AbstractUserRepository):
                 role=UserRole(row["role"]),
                 password_hash=row[
                     "password_hash"
-                ],  # Assuming password_hash is stored directly
+                ],
             )
         return None
 

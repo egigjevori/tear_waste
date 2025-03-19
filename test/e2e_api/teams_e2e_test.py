@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-async def test_create_team(patch_get_db_pool, client):
+async def test_create_team(patch_get_db_pool_team_service, client):
     # Define the payload for the POST request
     payload = {"name": "New Team"}
 
