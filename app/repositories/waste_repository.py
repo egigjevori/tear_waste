@@ -3,7 +3,7 @@ from typing import Optional
 
 from app.models.waste import WasteEntry
 from app.repositories import Repository
-from app.utils.db import execute_query, fetchrow
+from app.utils.db import execute, fetchrow
 
 
 class AbstractWasteRepository(Repository):
@@ -64,4 +64,4 @@ class WasteRepository(AbstractWasteRepository):
         DELETE FROM waste_entries
         WHERE id = $1
         """
-        await execute_query(self.conn, query, entry_id)
+        await execute(self.conn, query, entry_id)

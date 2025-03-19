@@ -1,4 +1,6 @@
+import logging
 import os
+from functools import wraps
 
 import asyncpg
 from asyncpg import (ForeignKeyViolationError, PostgresSyntaxError,
@@ -73,41 +75,49 @@ def get_db_pool() -> asyncpg.pool.Pool:
     return pool
 
 
-# TODO improve this and handle exceptions somewhere else
-# Wrapper function to handle asyncpg exceptions
-async def execute_query(conn: asyncpg.Connection, query: str, *args):
-    try:
-        # Execute the query using asyncpg
-        return await conn._execute(query, *args)  # type: ignore
-    except UniqueViolationError as _:
-        # logger.error(f"Unique violation error: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Unique constraint violated"
-        )
-    except ForeignKeyViolationError as _:
-        # logger.error(f"Foreign key violation error: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Referenced entity not found"
-        )
-    except PostgresSyntaxError as _:
-        # logger.error(f"SQL Syntax error: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="SQL syntax error"
-        )
-    except Exception as _:
-        # logger.error(f"Unexpected error: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Unexpected error occurred",
-        )
+def handle_errors(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+        except UniqueViolationError as _:
+            # logger.error(f"Unique violation error: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="Unique constraint violated"
+            )
+        except ForeignKeyViolationError as _:
+            # logger.error(f"Foreign key violation error: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Referenced entity not found"
+            )
+        except PostgresSyntaxError as _:
+            # logger.error(f"SQL Syntax error: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="SQL syntax error"
+            )
+        except Exception as _:
+            # logger.error(f"Unexpected error: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Unexpected error occurred",
+            )
 
+        return result
+    return wrapper
 
+@handle_errors
+async def execute(conn: asyncpg.Connection, query: str, *args):
+    logging.info(query)
+    return await conn.execute(query, *args)
+
+@handle_errors
 async def fetchrow(
     conn: asyncpg.Connection,
     query: str,
     *args,
 ):
-    data = await execute_query(conn, query, *args)
+    logging.info(query)
+    data = await conn.fetchrow(query, *args)
     if not data:
         return None
     return data[0]

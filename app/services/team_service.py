@@ -9,7 +9,8 @@ from app.utils.db import get_db_pool
 @asynccontextmanager
 async def get_team_repo() -> AsyncIterator[TeamRepository]:
     async with get_db_pool().acquire() as conn:
-        yield TeamRepository(conn)  # type: ignore
+        async with conn.transaction() as transaction:
+            yield TeamRepository(transaction)  # type: ignore
 
 
 async def create_team(name: str) -> Team:

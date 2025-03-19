@@ -2,16 +2,12 @@ from fastapi import Body
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.main import app
 from app.services import team_service
+from fastapi import APIRouter
 
+team_router = APIRouter()
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.post("/teams")
+@team_router.post("/teams")
 async def create_team(name: str = Body(...)) -> JSONResponse:
     await team_service.create_team(name)
     return JSONResponse(

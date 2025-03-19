@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
 
+import uvicorn
 from fastapi import FastAPI
 
+from app.routes.teams import team_router
 from app.utils import db
 
 
@@ -15,7 +17,11 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
+app.include_router(team_router)
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, host="0.0.0.0", port=8080)

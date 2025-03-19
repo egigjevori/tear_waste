@@ -1,14 +1,17 @@
 # conftest.py
-
+import asyncio
 import os
+from asyncio import AbstractEventLoop
 from contextlib import asynccontextmanager
-from typing import AsyncIterator, List, Optional
+from typing import AsyncIterator, List, Optional, Iterator
 from unittest.mock import patch
 
 import asyncpg
 import pytest
 from dotenv import load_dotenv
+from httpx import AsyncClient, ASGITransport
 
+from app.main import app
 from app.models.teams import Team
 from app.repositories.team_repository import AbstractTeamRepository
 from app.utils.db import initdb
@@ -16,6 +19,19 @@ from app.utils.db import initdb
 # Load environment variables from a .env file
 load_dotenv(dotenv_path=".env.test")
 
+@pytest.yield_fixture(scope='session')
+def event_loop(request):
+    """Create an instance of the default event loop for each test case."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+@pytest.fixture
+async def client():
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        yield client
 
 async def drop_tables(pool: asyncpg.Pool):
     async with pool.acquire() as conn:

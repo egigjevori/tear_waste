@@ -3,7 +3,7 @@ from typing import Optional
 
 from app.models.users import User, UserRole
 from app.repositories import Repository
-from app.utils.db import execute_query, fetchrow
+from app.utils.db import execute, fetchrow
 
 
 class AbstractUserRepository(Repository):
@@ -68,4 +68,4 @@ class UserRepository(AbstractUserRepository):
         DELETE FROM users
         WHERE id = $1
         """
-        await execute_query(self.conn, query, user_id)
+        await execute(self.conn, query, user_id)
