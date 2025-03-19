@@ -27,6 +27,8 @@ app.include_router(waste_router)
 @app.exception_handler(ValueError)
 async def value_error_exception_handler(_: Request, exc: ValueError):
     raise HTTPException(status_code=400, detail=str(exc))
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}

@@ -37,4 +37,3 @@ async def get_users_by_team_id(team_id: int):
         for user in users
     ]
     return JSONResponse(users, status_code=status.HTTP_200_OK)
-

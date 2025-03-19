@@ -40,19 +40,21 @@ async def get_user(user_id: int) -> Optional[User]:
         user = await repo.read(user_id)
         return user
 
+
 async def assert_user_exists(user_id: int) -> None:
     user = await get_user(user_id)
     if not user:
         raise ValueError(f"User {user_id} does not exist")
+
 
 async def delete_user(user_id: int) -> None:
     await assert_user_exists(user_id)
     async with get_user_repo() as repo:
         await repo.delete(user_id)
 
+
 async def get_users_by_team_id(team_id: int) -> List[User]:
     await team_service.assert_team_exists(team_id=team_id)
     async with get_user_repo() as repo:
         users = await repo.get_users_by_team_id(team_id)
         return users
-

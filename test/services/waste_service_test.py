@@ -11,7 +11,9 @@ async def test_create_waste_success(get_waste_repo_mock, get_team_repo_mock, get
 
     # Call the create_user function with the sample data
     team = await create_team(name="teamname")
-    user = await create_user(username="username1", role="Employee", email="<EMAIL>", team_id=team.id, password="password")
+    user = await create_user(
+        username="username1", role="Employee", email="<EMAIL>", team_id=team.id, password="password"
+    )
     created_waste = await create_waste(**sample_waste_data)
 
     # Assertions to verify the user was created correctly

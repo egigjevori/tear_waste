@@ -31,6 +31,7 @@ async def create_waste(
         entry = await repo.create(waste)
         return entry
 
+
 async def get_waste_by_user_id(user_id: int) -> List[WasteEntry]:
     await user_service.assert_user_exists(user_id)
     async with get_waste_repo() as repo:

@@ -32,7 +32,7 @@ async def get_waste_by_user_id(user_id: int) -> JSONResponse:
             "type": entry.type,
             "weight": entry.weight,
             "timestamp": entry.timestamp.isoformat(),  # Assuming timestamp is a datetime object
-            "user_id": entry.user_id
+            "user_id": entry.user_id,
         }
         for entry in waste_entries
     ]
