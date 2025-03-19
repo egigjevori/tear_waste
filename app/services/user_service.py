@@ -21,7 +21,7 @@ async def create_user(
     password: str,
 ) -> User:
     # TODO validate data
-    # TODO check if team exists
+    await team_service.assert_team_exists(team_id=team_id)
     user = User(
         username=username,
         email=email,
@@ -38,24 +38,21 @@ async def create_user(
 async def get_user(user_id: int) -> Optional[User]:
     async with get_user_repo() as repo:
         user = await repo.read(user_id)
-        if not user:
-            raise ValueError(f"User with ID {user_id} not found")
         return user
 
-
-async def delete_user(user_id: int) -> None:
+async def assert_user_exists(user_id: int) -> None:
     user = await get_user(user_id)
     if not user:
-        raise ValueError(f"User with ID {user_id} not found")
+        raise ValueError(f"User {user_id} does not exist")
 
+async def delete_user(user_id: int) -> None:
+    await assert_user_exists(user_id)
     async with get_user_repo() as repo:
         await repo.delete(user_id)
 
-
 async def get_users_by_team_id(team_id: int) -> List[User]:
-    if team_service.team_exists(team_id=team_id):
-        async with get_user_repo() as repo:
-            users = await repo.get_users_by_team_id(team_id)
-            return users
-    else:
-        raise ValueError(f"Team with ID {team_id} not found")
+    await team_service.assert_team_exists(team_id=team_id)
+    async with get_user_repo() as repo:
+        users = await repo.get_users_by_team_id(team_id)
+        return users
+

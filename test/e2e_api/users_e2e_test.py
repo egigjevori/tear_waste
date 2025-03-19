@@ -24,8 +24,10 @@ def create_test_user_data() -> dict:
     return user
 
 
-async def test_create_user(patch_get_db_pool_user_service, client):
+async def test_create_user(patch_get_db_pool_user_service, patch_get_db_pool_team_service, client):
     # Send a POST request to the /user endpoint
+    response = await client.post("/teams", data={"name": "New Team"})
+    assert response.status_code == 201
     response = await client.post("/users", json=sample_user_data)
 
     # Assert that the response status code is 201 (Created)
@@ -37,9 +39,12 @@ async def test_create_user(patch_get_db_pool_user_service, client):
 
 async def test_get_users_by_team_id(patch_get_db_pool_user_service, patch_get_db_pool_team_service, client):
     # Send a POST request to the /user endpoint
-    response = await client.post("/teams", json={"name": "New Team"})
+    response = await client.post("/teams", data={"name": "New Team"})
+    assert response.status_code == 201
     response = await client.post("/users", json=create_test_user_data())
+    assert response.status_code == 201
     response = await client.post("/users", json=create_test_user_data())
+    assert response.status_code == 201
     response = await client.get("/users/by-team/1")
 
     # Assert that the response status code is 201 (Created)

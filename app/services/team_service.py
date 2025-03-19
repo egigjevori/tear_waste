@@ -25,8 +25,7 @@ async def get_team(team_id: int) -> Team:
         return team
 
 
-async def team_exists(team_id: int) -> bool:
+async def assert_team_exists(team_id: int) -> None:
     team = await get_team(team_id)
-    if team:
-        return True
-    return False
+    if not team:
+        raise ValueError(f"Team {team_id} does not exist")

@@ -5,6 +5,7 @@ from app.models.users import User, UserRole
 from app.models.waste import WasteEntry
 from app.repositories.user_repository import UserRepository
 from app.repositories.waste_repository import WasteRepository
+from app.services import user_service
 from app.utils.db import get_db_pool
 
 
@@ -19,7 +20,7 @@ async def create_waste(
     weight: float,
     user_id: int,
 ) -> WasteEntry:
-    # TODO validate data
+    await user_service.assert_user_exists(user_id)
     waste = WasteEntry(
         type=type,
         weight=weight,
