@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from app.routes.team_routes import team_router
 from app.routes.user_routes import user_router
+from app.routes.waste_routes import waste_router
 from app.utils import db
 
 
@@ -20,6 +21,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(team_router)
 app.include_router(user_router)
+app.include_router(waste_router)
 
 @app.get("/")
 async def root():
