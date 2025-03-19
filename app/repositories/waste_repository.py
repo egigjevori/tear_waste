@@ -28,6 +28,11 @@ class AbstractWasteRepository(Repository):
         """Delete a waste entry by its ID."""
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_waste_by_team_id(self, team_id: int) -> List[WasteEntry]:
+        """Delete a waste entry by its ID."""
+        raise NotImplementedError
+
 
 class WasteRepository(AbstractWasteRepository):
     async def create(self, waste_entry: WasteEntry) -> WasteEntry:
@@ -78,7 +83,12 @@ class WasteRepository(AbstractWasteRepository):
         WHERE user_id = $1
         """
         rows = await fetch(self.conn, query, user_id)
-        waste_entries = [
+        waste_entries = self._rows_to_entries(rows)
+        return waste_entries
+
+    @staticmethod
+    def _rows_to_entries(rows) -> List[WasteEntry]:
+        return [
             WasteEntry(
                 id=row["id"],
                 type=row["type"],
@@ -88,4 +98,15 @@ class WasteRepository(AbstractWasteRepository):
             )
             for row in rows
         ]
+
+    async def get_waste_by_team_id(self, team_id: int) -> List[WasteEntry]:
+        query = """
+        SELECT *
+        FROM waste_entries
+        WHERE user_id IN (
+            SELECT id FROM users WHERE team_id = $1
+        )
+        """
+        rows = await fetch(self.conn, query, team_id)
+        waste_entries = self._rows_to_entries(rows)
         return waste_entries

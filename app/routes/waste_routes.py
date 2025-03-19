@@ -31,7 +31,25 @@ async def get_waste_by_user_id(user_id: int) -> JSONResponse:
             "id": entry.id,
             "type": entry.type,
             "weight": entry.weight,
-            "timestamp": entry.timestamp.isoformat(),  # Assuming timestamp is a datetime object
+            "timestamp": entry.timestamp.isoformat(),
+            "user_id": entry.user_id,
+        }
+        for entry in waste_entries
+    ]
+
+    return JSONResponse(content=waste_entries_data, status_code=status.HTTP_200_OK)
+
+@waste_router.get("/waste/team/{team_id}")
+async def get_waste_by_team_id(team_id: int) -> JSONResponse:
+    #TODO if logged in user is manager, check for access to team
+    waste_entries = await waste_service.get_waste_by_team_id(team_id)
+
+    waste_entries_data = [
+        {
+            "id": entry.id,
+            "type": entry.type,
+            "weight": entry.weight,
+            "timestamp": entry.timestamp.isoformat(),
             "user_id": entry.user_id,
         }
         for entry in waste_entries
