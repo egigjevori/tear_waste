@@ -151,6 +151,9 @@ class FakeUserRepository(AbstractUserRepository):
         # Filter users by team_id
         return [user for user in self.users.values() if user.team_id == team_id]
 
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        pass
+
 
 fake_user_repo = FakeUserRepository(None)
 

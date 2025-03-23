@@ -14,7 +14,7 @@ def base64_url_encode(data):
 class JWTError(Exception):
     pass
 
-def create_jwt(payload):
+def create_jwt(payload) -> str:
     # Create the Header
     header = {"alg": "HS256", "typ": "JWT"}
     header_json = json.dumps(header, separators=(",", ":")).encode()
@@ -32,7 +32,7 @@ def create_jwt(payload):
     # Combine all parts
     return f"{encoded_header}.{encoded_payload}.{encoded_signature}"
 
-def verify_jwt(token):
+def verify_jwt(token) -> dict:
     try:
         # Split token into parts
         encoded_header, encoded_payload, encoded_signature = token.split(".")
@@ -42,7 +42,7 @@ def verify_jwt(token):
 
         # Check expiration time
         if "exp" in decoded_payload and decoded_payload["exp"] < time.time():
-            return "Token expired!"
+            raise JWTError(f"Token expired")
 
         # Recalculate signature
         message = f"{encoded_header}.{encoded_payload}".encode()

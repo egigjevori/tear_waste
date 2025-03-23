@@ -58,3 +58,9 @@ async def get_users_by_team_id(team_id: int) -> List[User]:
     async with get_user_repo() as repo:
         users = await repo.get_users_by_team_id(team_id)
         return users
+
+
+async def get_user_by_username(username: str) -> Optional[User]:
+    async with get_user_repo() as repo:
+        user = await repo.get_user_by_username(username)
+        return user

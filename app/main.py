@@ -2,10 +2,14 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
+
+from app.routes.authentication_routes import authentication_router
 from app.routes.team_routes import team_router
 from app.routes.user_routes import user_router
 from app.routes.waste_routes import waste_router
+from app.services.authentication_service import AuthenticationError
 from app.utils import db
+from app.utils.jwt import JWTError
 
 
 @asynccontextmanager
@@ -19,6 +23,7 @@ async def lifespan(_: FastAPI):
 # TODO global error handling
 app = FastAPI(lifespan=lifespan)
 
+app.include_router(authentication_router)
 app.include_router(team_router)
 app.include_router(user_router)
 app.include_router(waste_router)
@@ -27,6 +32,10 @@ app.include_router(waste_router)
 @app.exception_handler(ValueError)
 async def value_error_exception_handler(_: Request, exc: ValueError):
     raise HTTPException(status_code=400, detail=str(exc))
+
+@app.exception_handler(AuthenticationError)
+async def authentication_error_exception_handler(_: Request, exc: ValueError):
+    raise HTTPException(status_code=401, detail=str(exc))
 
 
 @app.get("/")

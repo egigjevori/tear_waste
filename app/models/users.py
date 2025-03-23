@@ -5,16 +5,14 @@ from dataclasses import dataclass
 
 import bcrypt
 
+from app.utils.password import hash_password
+
 
 class UserRole(enum.Enum):
     EMPLOYEE = "Employee"
     MANAGER = "Manager"
     ADMIN = "Admin"
 
-
-def _hash_password(password):
-    """Hash the user's password."""
-    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 @dataclass
@@ -37,7 +35,7 @@ class User:
 
     def set_password(self, password):
         """Hash and set the user's password."""
-        self.password_hash = _hash_password(password)
+        self.password_hash = hash_password(password)
 
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}', email='{self.email}', role='{self.role}')>"

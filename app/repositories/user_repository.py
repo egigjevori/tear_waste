@@ -27,6 +27,11 @@ class AbstractUserRepository(Repository):
         """Get users by their team id."""
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        """Get users by their team id."""
+        raise NotImplementedError
+
 
 class UserRepository(AbstractUserRepository):
 
@@ -92,3 +97,21 @@ class UserRepository(AbstractUserRepository):
             for row in rows
         ]
         return users
+
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        query = """
+        SELECT *
+        FROM users
+        WHERE username = $1
+        """
+        row = await fetchrow(self.conn, query, username)
+        if row:
+            return User(
+                id=row["id"],
+                username=row["username"],
+                email=row["email"],
+                team_id=row["team_id"],
+                role=UserRole(row["role"]),
+                password_hash=row["password_hash"],
+            )
+        return None
