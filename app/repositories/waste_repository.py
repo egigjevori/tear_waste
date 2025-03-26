@@ -105,8 +105,6 @@ class CacheWasteRepository(WasteRepository):
         await super().delete(entry_id)
         await cache.delete_key(f"waste:{entry_id}")
         await cache.delete_key(f"waste_by_user_id:{entry.user_id}")
-        team_id = await self._get_team_id(entry.user_id)
-        await cache.delete_key(f"waste_by_team_id:{entry.user_id}")
 
     async def get_waste_by_user_id(self, user_id: int) -> List[WasteEntry]:
         cache_key = f"waste_by_user_id:{user_id}"

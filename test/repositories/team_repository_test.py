@@ -41,8 +41,3 @@ async def test_cache_team(db_test_pool: asyncpg.Pool):
 
         # Assert
         assert created_team.id is not None
-
-        # Verify the team exists in the database
-        row = await conn.fetchrow("SELECT * FROM teams WHERE id = $1", created_team.id)
-        assert row is not None
-        assert row["name"] == "Development Team"

@@ -3,7 +3,7 @@ from datetime import datetime
 import asyncpg
 
 from app.models.waste import WasteEntry
-from app.repositories.waste_repository import WasteRepository
+from app.repositories.waste_repository import WasteRepository, CacheWasteRepository
 
 
 async def test_create_waste_entry(db_test_pool: asyncpg.Pool):
@@ -77,3 +77,27 @@ async def test_delete_waste_entry(db_test_pool: asyncpg.Pool):
         # Verify the entry no longer exists in the database
         row = await conn.fetchrow("SELECT * FROM waste_entries WHERE id = $1", created_entry.id)
         assert row is None
+
+async def test_delete_waste_entry_cache(db_test_pool: asyncpg.Pool):
+    # Arrange
+    async with db_test_pool.acquire() as conn:
+        repo = CacheWasteRepository(conn)
+        waste_entry = WasteEntry(
+            type="Plastic",
+            weight=2.5,
+            timestamp=datetime.now(),
+            user_id=1,
+        )
+
+        # Create a waste entry to delete
+        created_entry = await repo.create(waste_entry)
+        created_entry = await repo.read(waste_entry.id)
+        created_entry = await repo.read(waste_entry.id)
+        entries = await repo.get_waste_by_user_id(waste_entry.user_id)
+        entries = await repo.get_waste_by_user_id(waste_entry.user_id)
+        entries = await repo.get_waste_by_user_id(waste_entry.user_id)
+
+        await repo.delete(created_entry.id)
+        # Assert
+        entries = await repo.get_waste_by_user_id(waste_entry.user_id)
+        assert len(entries) == 0

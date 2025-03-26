@@ -2,7 +2,7 @@ import asyncpg
 import pytest
 
 from app.models.users import User, UserRole
-from app.repositories.user_repository import UserRepository
+from app.repositories.user_repository import UserRepository, CacheUserRepository
 
 
 def create_test_user() -> User:
@@ -108,3 +108,31 @@ async def test_get_users_by_team_id(db_test_pool: asyncpg.Pool):
         # Test with a team_id that has no users
         users = await repo.get_users_by_team_id(9999)  # Assuming 9999 is a non-existent team_id
         assert len(users) == 0
+
+async def test_get_users_by_team_id_cache(db_test_pool: asyncpg.Pool):
+    # Arrange
+    async with db_test_pool.acquire() as conn:
+        repo = CacheUserRepository(conn)
+
+        # Create multiple users with the same team_id
+        user1 = create_test_user()
+        user2 = create_test_user()
+        user2.username = "testuser2"
+        user2.email = "testuser2@example.com"
+
+        created_user1 = await repo.create(user1)
+        created_user2 = await repo.create(user2)
+
+        # Act
+        users = await repo.get_users_by_team_id(user1.team_id)
+        users = await repo.get_users_by_team_id(user1.team_id)
+        users = await repo.get_users_by_team_id(user1.team_id)
+
+        await repo.delete(created_user1.id)
+
+        users = await repo.get_users_by_team_id(user2.team_id)
+
+        # Assert
+        assert len(users) == 1
+        assert any(u.id == created_user2.id for u in users)
+
