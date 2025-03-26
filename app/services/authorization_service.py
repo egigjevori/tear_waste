@@ -11,40 +11,55 @@ from app.utils.permissions import Permission, ROLE_PERMISSIONS
 class AuthorizationError(Exception):
     pass
 
+
 def verify(assertion: bool, message: str) -> bool:
     if not assertion:
         raise AuthorizationError(message)
 
+
 async def verify_authorization(current_user: User, permission: Permission, request_data: dict):
     user_permissions = ROLE_PERMISSIONS[current_user.role]
     if permission not in user_permissions:
-        raise AuthorizationError(f"User {current_user.id}, role {current_user.role.value} does not have permission to {permission}")
+        raise AuthorizationError(
+            f"User {current_user.id}, role {current_user.role.value} does not have permission to {permission}"
+        )
 
     if current_user.role == UserRole.EMPLOYEE:
         # custom Employee authorization logic
         if permission == Permission.GET_WASTE_BY_USER_ID:
             request_user_id = request_data["user_id"]
-            verify(request_user_id == current_user.id, f"User {current_user.id} does not have access to user {request_user_id}")
+            verify(
+                request_user_id == current_user.id,
+                f"User {current_user.id} does not have access to user {request_user_id}",
+            )
 
     if current_user.role == UserRole.MANAGER:
         # custom Manager authorization logic
         if permission == Permission.GET_WASTE_BY_USER_ID:
             request_user_id = request_data["user_id"]
             team_users = await user_service.get_users_by_team_id(current_user.team_id)
-            verify(request_user_id in [u.id for u in team_users], f"User {current_user.id} does not have access to user {request_user_id}")
+            verify(
+                request_user_id in [u.id for u in team_users],
+                f"User {current_user.id} does not have access to user {request_user_id}",
+            )
 
         if permission in [Permission.GET_WASTE_BY_TEAM_ID, Permission.GET_USERS_BY_TEAM_ID]:
             request_team_id = request_data["team_id"]
-            verify(request_team_id == current_user.team_id, f"User {current_user.id} is not the manager of {request_team_id}")
+            verify(
+                request_team_id == current_user.team_id,
+                f"User {current_user.id} is not the manager of {request_team_id}",
+            )
 
 
 def require_permission(required_permission: Permission):
     def decorator(func: Callable):
         @wraps(func)
         async def wrapper(*args, **kwargs):
-            request: Request = kwargs.get('request')
+            request: Request = kwargs.get("request")
             await verify_authorization(request.state.user, required_permission, kwargs)
 
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator

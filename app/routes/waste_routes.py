@@ -44,10 +44,11 @@ async def get_waste_by_user_id(request: Request, user_id: int) -> JSONResponse:
 
     return JSONResponse(content=waste_entries_data, status_code=status.HTTP_200_OK)
 
+
 @waste_router.get("/waste/team/{team_id}")
 @authorization_service.require_permission(Permission.GET_WASTE_BY_TEAM_ID)
 async def get_waste_by_team_id(request: Request, team_id: int) -> JSONResponse:
-    #TODO if logged in user is manager, check for access to team
+    # TODO if logged in user is manager, check for access to team
     waste_entries = await waste_service.get_waste_by_team_id(team_id)
 
     waste_entries_data = [

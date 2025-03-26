@@ -19,11 +19,10 @@ def create_token(user: User) -> str:
         "sub": user.id,
         "exp": int(time.time()) + (3600 * 24 * 30),  # Expires in 30 days
         "iat": int(time.time()),
-
         "role": user.role.value,
         "username": user.username,
         "email": user.email,
-        "team_id": user.team_id
+        "team_id": user.team_id,
     }
     token = create_jwt(payload)
     return token

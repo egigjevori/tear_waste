@@ -7,12 +7,15 @@ import time
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 
+
 def base64_url_encode(data):
     """Encodes data to Base64 URL-safe format (without padding)."""
     return base64.urlsafe_b64encode(data).decode().rstrip("=")
 
+
 class JWTError(Exception):
     pass
+
 
 def create_jwt(payload: dict) -> str:
     # Create the Header
@@ -31,6 +34,7 @@ def create_jwt(payload: dict) -> str:
 
     # Combine all parts
     return f"{encoded_header}.{encoded_payload}.{encoded_signature}"
+
 
 def verify_jwt(token: str) -> dict:
     try:

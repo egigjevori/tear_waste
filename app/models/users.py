@@ -14,7 +14,6 @@ class UserRole(enum.Enum):
     ADMIN = "Admin"
 
 
-
 @dataclass
 class User:
     def __init__(

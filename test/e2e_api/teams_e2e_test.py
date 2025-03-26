@@ -1,5 +1,3 @@
-
-
 async def test_create_team(patch_get_db_pool_team_service, no_auth_client):
     # Define the payload for the POST request
     payload = {"name": "New Team"}

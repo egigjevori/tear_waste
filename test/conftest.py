@@ -43,11 +43,14 @@ async def no_auth_client():
             @wraps(func)
             async def wrapper(*args, **kwargs):
                 return await func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
     with patch("app.services.authorization_service.require_permission", require_permission):
         from app.main import app
+
         app.user_middleware = []
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
             yield client
@@ -229,4 +232,3 @@ async def get_waste_repo() -> AsyncIterator[AbstractWasteRepository]:
 def get_waste_repo_mock():
     with patch("app.services.waste_service.get_waste_repo", wraps=get_waste_repo) as mock_repo:
         yield mock_repo
-

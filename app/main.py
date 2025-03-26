@@ -30,6 +30,7 @@ app.include_router(team_router)
 app.include_router(user_router)
 app.include_router(waste_router)
 
+
 @app.middleware("authentication")
 async def authentication(request: Request, call_next):
     if request.url.path == "/login":
@@ -66,5 +67,5 @@ async def root():
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)
 
-#TODO rate limit
-#TODO add cache
+# TODO rate limit
+# TODO add cache

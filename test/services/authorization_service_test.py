@@ -10,11 +10,13 @@ from app.utils.permissions import Permission
 
 @pytest.fixture
 def mock_user_service():
-    with patch('app.services.authorization_service.user_service', return_value=AsyncMock()) as mock:
-        mock.get_users_by_team_id = AsyncMock(return_value=[
-            User(id=2, role=UserRole.EMPLOYEE, team_id=1, username="test", email="<EMAIL>"),
-            User(id=3, role=UserRole.EMPLOYEE, team_id=1, username="test", email="<EMAIL>"),
-        ])
+    with patch("app.services.authorization_service.user_service", return_value=AsyncMock()) as mock:
+        mock.get_users_by_team_id = AsyncMock(
+            return_value=[
+                User(id=2, role=UserRole.EMPLOYEE, team_id=1, username="test", email="<EMAIL>"),
+                User(id=3, role=UserRole.EMPLOYEE, team_id=1, username="test", email="<EMAIL>"),
+            ]
+        )
         yield
 
 

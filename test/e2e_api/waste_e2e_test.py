@@ -42,6 +42,7 @@ async def test_get_waste_by_user_id(
     # Assert that the response body contains the expected message
     assert response.json() == [{"id": 1, "timestamp": ANY, "type": "trash", "user_id": 1, "weight": 3.4}]
 
+
 async def test_get_waste_by_team_id(
     patch_get_db_pool_waste_service, patch_get_db_pool_user_service, patch_get_db_pool_team_service, no_auth_client
 ):

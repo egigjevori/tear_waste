@@ -17,4 +17,3 @@ async def login(
 ) -> JSONResponse:
     token = await authentication_service.authenticate(username, password)
     return JSONResponse({"access_token": token}, status_code=status.HTTP_200_OK)
-
