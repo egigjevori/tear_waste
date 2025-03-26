@@ -1,7 +1,7 @@
 from dataclasses import asdict
 from typing import List
 
-from fastapi import Body, HTTPException
+from fastapi import Body, HTTPException, Request
 from starlette import status
 from starlette.responses import JSONResponse
 
@@ -14,6 +14,7 @@ user_router = APIRouter()
 
 @user_router.post("/users")
 async def create_user(
+    request: Request,
     username: str = Body(...),
     email: str = Body(...),
     role: str = Body(...),
@@ -25,7 +26,7 @@ async def create_user(
 
 
 @user_router.get("/users/by-team/{team_id}")
-async def get_users_by_team_id(team_id: int):
+async def get_users_by_team_id(request: Request, team_id: int):
     users = await user_service.get_users_by_team_id(team_id=team_id)
     users = [
         {

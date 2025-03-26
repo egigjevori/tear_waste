@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Body
+from fastapi import Body, Request
 from starlette import status
 from starlette.responses import JSONResponse
 
@@ -13,6 +13,7 @@ waste_router = APIRouter()
 
 @waste_router.post("/waste")
 async def create_waste(
+    request: Request,
     type: str = Body(...),
     weight: float = Body(...),
     user_id: int = Body(...),
@@ -22,7 +23,7 @@ async def create_waste(
 
 
 @waste_router.get("/waste/user/{user_id}")
-async def get_waste_by_user_id(user_id: int) -> JSONResponse:
+async def get_waste_by_user_id(request: Request, user_id: int) -> JSONResponse:
     waste_entries = await waste_service.get_waste_by_user_id(user_id)
 
     # Manually construct the JSON response
@@ -40,7 +41,7 @@ async def get_waste_by_user_id(user_id: int) -> JSONResponse:
     return JSONResponse(content=waste_entries_data, status_code=status.HTTP_200_OK)
 
 @waste_router.get("/waste/team/{team_id}")
-async def get_waste_by_team_id(team_id: int) -> JSONResponse:
+async def get_waste_by_team_id(request: Request, team_id: int) -> JSONResponse:
     #TODO if logged in user is manager, check for access to team
     waste_entries = await waste_service.get_waste_by_team_id(team_id)
 
