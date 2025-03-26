@@ -4,14 +4,13 @@ import os
 from asyncio import AbstractEventLoop
 from contextlib import asynccontextmanager
 from functools import wraps
-from typing import AsyncIterator, List, Optional, Iterator, Dict, Callable
-from unittest.mock import patch, AsyncMock
+from typing import AsyncIterator, Callable, Dict, Iterator, List, Optional
+from unittest.mock import AsyncMock, patch
 
 import asyncpg
 import pytest
 from dotenv import load_dotenv
-from httpx import AsyncClient, ASGITransport
-
+from httpx import ASGITransport, AsyncClient
 
 from app.models.teams import Team
 from app.models.users import User, UserRole

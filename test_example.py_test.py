@@ -1,7 +1,8 @@
-import pytest
-from httpx import AsyncClient
-from fastapi import status
 from unittest.mock import AsyncMock, patch
+
+import pytest
+from fastapi import status
+from httpx import AsyncClient
 from main import app  # Assuming your FastAPI app is defined in main.py
 from services.user_service import user_service  # Adjust the import based on your project structure
 

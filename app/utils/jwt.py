@@ -46,7 +46,7 @@ def verify_jwt(token: str) -> dict:
 
         # Check expiration time
         if "exp" in decoded_payload and decoded_payload["exp"] < time.time():
-            raise JWTError(f"Token expired")
+            raise JWTError("Token expired")
 
         # Recalculate signature
         message = f"{encoded_header}.{encoded_payload}".encode()

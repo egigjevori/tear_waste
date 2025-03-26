@@ -5,14 +5,14 @@ from fastapi import Request
 
 from app.models.users import User, UserRole
 from app.services import user_service
-from app.utils.permissions import Permission, ROLE_PERMISSIONS
+from app.utils.permissions import ROLE_PERMISSIONS, Permission
 
 
 class AuthorizationError(Exception):
     pass
 
 
-def verify(assertion: bool, message: str) -> bool:
+def verify(assertion: bool, message: str):
     if not assertion:
         raise AuthorizationError(message)
 

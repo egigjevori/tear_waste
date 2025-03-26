@@ -1,11 +1,9 @@
 from contextlib import asynccontextmanager
 from typing import AsyncIterator, List
 
-from app.models.users import User, UserRole
 from app.models.waste import WasteEntry
-from app.repositories.user_repository import UserRepository
 from app.repositories.waste_repository import WasteRepository
-from app.services import user_service, team_service
+from app.services import team_service, user_service
 from app.utils.db import get_db_pool
 
 

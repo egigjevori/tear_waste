@@ -3,8 +3,6 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 
-import bcrypt
-
 from app.utils.password import hash_password
 
 

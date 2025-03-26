@@ -1,13 +1,11 @@
-import functools
-import time
+from __future__ import annotations
 
-from starlette.responses import JSONResponse
+import time
 
 from app.models.users import User, UserRole
 from app.services import user_service
-from app.utils.jwt import create_jwt, verify_jwt, JWTError
-from app.utils.password import hash_password, verify_password
-from app.utils.permissions import Permission
+from app.utils.jwt import JWTError, create_jwt, verify_jwt
+from app.utils.password import verify_password
 
 
 class AuthenticationError(Exception):
@@ -32,14 +30,14 @@ async def authenticate(username: str, password: str) -> str:
     user = await user_service.get_user_by_username(username)
     if not user:
         raise AuthenticationError(f"User {username} not found")
-    if not verify_password(password, user.password_hash):
-        raise AuthenticationError(f"Wrong password")
+    if not verify_password(password, user.password_hash):  # type: ignore
+        raise AuthenticationError("Wrong password")
 
     token = create_token(user)
     return token
 
 
-async def verify_authentication(token: str) -> User:
+async def verify_authentication(token: str | None) -> User:
     if not token or not token.startswith("Bearer "):
         raise AuthenticationError("Invalid or missing Authorization header")
     token = token.removeprefix("Bearer ").strip()

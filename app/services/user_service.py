@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import AsyncIterator, Optional, List
+from typing import AsyncIterator, List, Optional
 
 from app.models.users import User, UserRole
 from app.repositories.user_repository import UserRepository

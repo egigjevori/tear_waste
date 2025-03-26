@@ -1,10 +1,11 @@
 # file: tests/test_authorization_service.py
 
-import pytest
 from unittest.mock import AsyncMock, patch
 
+import pytest
+
 from app.models.users import User, UserRole
-from app.services.authorization_service import verify_authorization, AuthorizationError
+from app.services.authorization_service import AuthorizationError, verify_authorization
 from app.utils.permissions import Permission
 
 

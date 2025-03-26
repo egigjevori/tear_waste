@@ -28,6 +28,7 @@ async def connect() -> asyncpg.Pool:
 
 
 async def disconnect():
+    global pool
     await pool.close()
 
 
@@ -72,6 +73,7 @@ async def initdb(pool: asyncpg.Pool):
 
 
 def get_db_pool() -> asyncpg.pool.Pool:
+    global pool
     return pool
 
 

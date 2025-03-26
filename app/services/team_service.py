@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
@@ -19,7 +21,7 @@ async def create_team(name: str) -> Team:
         return team
 
 
-async def get_team(team_id: int) -> Team:
+async def get_team(team_id: int) -> Team | None:
     async with get_team_repo() as repo:
         team = await repo.read(team_id)
         return team

@@ -1,7 +1,7 @@
+import time
 from unittest.mock import ANY
 
 from app.utils.jwt import create_jwt, verify_jwt
-import time
 
 
 async def test_jwt():

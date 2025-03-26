@@ -1,11 +1,8 @@
-from heapq import heapify
-
-from fastapi import Body
+from fastapi import APIRouter, Body
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.services import team_service, authentication_service
-from fastapi import APIRouter
+from app.services import authentication_service
 
 authentication_router = APIRouter()
 

@@ -1,13 +1,8 @@
-from typing import List
-
-from fastapi import Body, Request
+from fastapi import APIRouter, Body, Request
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.models.waste import WasteEntry
-from app.services import team_service, waste_service, authorization_service
-from fastapi import APIRouter
-
+from app.services import authorization_service, waste_service
 from app.utils.permissions import Permission
 
 waste_router = APIRouter()

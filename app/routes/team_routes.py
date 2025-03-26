@@ -1,10 +1,8 @@
-from fastapi import Body, Request
+from fastapi import APIRouter, Body, Request
 from starlette import status
 from starlette.responses import JSONResponse
 
-from app.services import team_service, authentication_service, authorization_service
-from fastapi import APIRouter
-
+from app.services import authorization_service, team_service
 from app.utils.permissions import Permission
 
 team_router = APIRouter()

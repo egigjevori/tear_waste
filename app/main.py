@@ -11,7 +11,6 @@ from app.services import authentication_service
 from app.services.authentication_service import AuthenticationError
 from app.services.authorization_service import AuthorizationError
 from app.utils import db
-from app.utils.jwt import JWTError
 
 
 @asynccontextmanager
