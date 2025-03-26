@@ -1,3 +1,4 @@
+import logging
 from functools import wraps
 from typing import Callable
 
@@ -7,6 +8,8 @@ from app.models.users import User, UserRole
 from app.services import user_service
 from app.utils.permissions import ROLE_PERMISSIONS, Permission
 
+logger = logging.getLogger(__name__)
+
 
 class AuthorizationError(Exception):
     pass
@@ -14,12 +17,17 @@ class AuthorizationError(Exception):
 
 def verify(assertion: bool, message: str):
     if not assertion:
+        logger.warning(f"Authorization verification failed: {message}")
         raise AuthorizationError(message)
 
 
 async def verify_authorization(current_user: User, permission: Permission, request_data: dict):
+    logger.info(
+        f"Verifying authorization for user {current_user.id} with role {current_user.role.value} for permission {permission}")
+
     user_permissions = ROLE_PERMISSIONS[current_user.role]
     if permission not in user_permissions:
+        logger.warning(f"User {current_user.id} does not have permission to {permission}")
         raise AuthorizationError(
             f"User {current_user.id}, role {current_user.role.value} does not have permission to {permission}"
         )
@@ -50,6 +58,8 @@ async def verify_authorization(current_user: User, permission: Permission, reque
                 f"User {current_user.id} is not the manager of {request_team_id}",
             )
 
+    logger.info(f"Authorization verified for user {current_user.id} with permission {permission}")
+
 
 def require_permission(required_permission: Permission):
     def decorator(func: Callable):
@@ -57,7 +67,6 @@ def require_permission(required_permission: Permission):
         async def wrapper(*args, **kwargs):
             request: Request = kwargs.get("request")
             await verify_authorization(request.state.user, required_permission, kwargs)
-
             return await func(*args, **kwargs)
 
         return wrapper

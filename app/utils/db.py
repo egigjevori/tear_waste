@@ -8,8 +8,8 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from starlette import status
 
+logger = logging.getLogger(__name__)
 load_dotenv()
-
 
 DATABASE_URL = (
     f"postgresql://{os.getenv('POSTGRES_USER')}"
@@ -23,17 +23,22 @@ pool: asyncpg.Pool
 
 async def connect() -> asyncpg.Pool:
     global pool
+    logger.info("Connecting to the database")
     pool = await asyncpg.create_pool(DATABASE_URL)
+    logger.info("Database connection pool created")
     return pool
 
 
 async def disconnect():
     global pool
+    logger.info("Closing the database connection pool")
     await pool.close()
-
+    logger.info("Database connection pool closed")
 
 async def initdb(pool: asyncpg.Pool):
+    logger.info("Initializing the database")
     async with pool.acquire() as conn:
+        logger.info("Creating tables")
         await conn.execute(
             """
             create table if not exists waste_entries
@@ -69,9 +74,11 @@ async def initdb(pool: asyncpg.Pool):
             );
         """
         )
+        logger.info("Creating indexes")
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_waste_entries_user_id ON waste_entries (user_id);")
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_users_team_id ON users (team_id);")
         await conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users (username);")
+    logger.info("Database initialized")
 
 
 def get_db_pool() -> asyncpg.pool.Pool:
@@ -84,17 +91,17 @@ def handle_errors(func):
     def wrapper(*args, **kwargs):
         try:
             result = func(*args, **kwargs)
-        except UniqueViolationError as _:
-            # logger.error(f"Unique violation error: {str(e)}")
+        except UniqueViolationError as e:
+            logger.error(f"Unique violation error: {str(e)}")
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Unique constraint violated")
-        except ForeignKeyViolationError as _:
-            # logger.error(f"Foreign key violation error: {str(e)}")
+        except ForeignKeyViolationError as e:
+            logger.error(f"Foreign key violation error: {str(e)}")
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Referenced entity not found")
-        except PostgresSyntaxError as _:
-            # logger.error(f"SQL Syntax error: {str(e)}")
+        except PostgresSyntaxError as e:
+            logger.error(f"SQL Syntax error: {str(e)}")
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="SQL syntax error")
-        except Exception as _:
-            # logger.error(f"Unexpected error: {str(e)}")
+        except Exception as e:
+            logger.error(f"Unexpected error: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Unexpected error occurred",
@@ -107,7 +114,7 @@ def handle_errors(func):
 
 @handle_errors
 async def execute(conn: asyncpg.Connection, query: str, *args):
-    logging.info(query)
+    logger.info(f"Executing query: {query}")
     return await conn.execute(query, *args)
 
 
@@ -117,7 +124,7 @@ async def fetchrow(
     query: str,
     *args,
 ):
-    logging.info(query)
+    logger.info(f"Fetching row with query: {query}")
     data = await conn.fetchrow(query, *args)
     return data
 
@@ -128,6 +135,6 @@ async def fetch(
     query: str,
     *args,
 ):
-    logging.info(query)
+    logger.info(f"Fetching data with query: {query}")
     data = await conn.fetch(query, *args)
     return data

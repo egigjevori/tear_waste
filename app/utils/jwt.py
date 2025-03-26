@@ -2,9 +2,10 @@ import base64
 import hashlib
 import hmac
 import json
+import logging
 import os
 import time
-
+logger = logging.getLogger(__name__)
 SECRET_KEY = os.environ["SECRET_KEY"]
 
 
