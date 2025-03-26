@@ -5,9 +5,11 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 from app.services import authentication_service
+
 logger = logging.getLogger(__name__)
 
 authentication_router = APIRouter()
+
 
 @authentication_router.post("/login")
 async def login(

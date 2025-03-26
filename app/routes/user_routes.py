@@ -16,15 +16,16 @@ user_router = APIRouter()
 @user_router.post("/users")
 @authorization_service.require_permission(Permission.CREATE_USER)
 async def create_user(
-        _: Request,
-        username: str = Body(...),
-        email: str = Body(...),
-        role: str = Body(...),
-        team_id: int = Body(...),
-        password: str = Body(...),
+    _: Request,
+    username: str = Body(...),
+    email: str = Body(...),
+    role: str = Body(...),
+    team_id: int = Body(...),
+    password: str = Body(...),
 ) -> JSONResponse:
     logger.info(
-        f"Attempting to create user with username: {username}, email: {email}, role: {role}, team_id: {team_id}")
+        f"Attempting to create user with username: {username}, email: {email}, role: {role}, team_id: {team_id}"
+    )
 
     await user_service.create_user(username, email, role, team_id, password)
 

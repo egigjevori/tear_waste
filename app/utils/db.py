@@ -35,6 +35,7 @@ async def disconnect():
     await pool.close()
     logger.info("Database connection pool closed")
 
+
 async def initdb(pool: asyncpg.Pool):
     logger.info("Initializing the database")
     async with pool.acquire() as conn:

@@ -23,7 +23,8 @@ def verify(assertion: bool, message: str):
 
 async def verify_authorization(current_user: User, permission: Permission, request_data: dict):
     logger.info(
-        f"Verifying authorization for user {current_user.id} with role {current_user.role.value} for permission {permission}")
+        f"Verifying authorization for user {current_user.id} with role {current_user.role.value} for permission {permission}"
+    )
 
     user_permissions = ROLE_PERMISSIONS[current_user.role]
     if permission not in user_permissions:

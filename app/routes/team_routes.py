@@ -6,6 +6,7 @@ from starlette.responses import JSONResponse
 
 from app.services import authorization_service, team_service
 from app.utils.permissions import Permission
+
 logger = logging.getLogger(__name__)
 team_router = APIRouter()
 

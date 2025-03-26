@@ -17,11 +17,11 @@ async def get_user_repo() -> AsyncIterator[UserRepository]:
 
 
 async def create_user(
-        username: str,
-        email: str,
-        role: str,
-        team_id: int,
-        password: str,
+    username: str,
+    email: str,
+    role: str,
+    team_id: int,
+    password: str,
 ) -> User:
     logger.info(f"Creating user with username: {username}, email: {email}, role: {role}, team_id: {team_id}")
 

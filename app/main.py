@@ -23,6 +23,7 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
 logger.addHandler(console_handler)
 
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     pool = await db.connect()
@@ -30,7 +31,9 @@ async def lifespan(_: FastAPI):
     yield
     await db.disconnect()
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 class LogRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
@@ -51,12 +54,14 @@ class LogRequestMiddleware(BaseHTTPMiddleware):
         logger.info(f"Request ID: {request_id} - Response Status: {response.status_code}")
         return response
 
+
 # Add middleware to the FastAPI app
 app.add_middleware(LogRequestMiddleware)
 app.include_router(authentication_router)
 app.include_router(team_router)
 app.include_router(user_router)
 app.include_router(waste_router)
+
 
 @app.middleware("authentication")
 async def authentication(request: Request, call_next):
@@ -76,25 +81,30 @@ async def authentication(request: Request, call_next):
     response = await call_next(request)
     return response
 
+
 @app.exception_handler(ValueError)
 async def value_error_exception_handler(_: Request, exc: ValueError):
     logger.error(f"ValueError occurred: {str(exc)}")
     raise HTTPException(status_code=400, detail=str(exc))
+
 
 @app.exception_handler(AuthenticationError)
 async def authentication_error_exception_handler(_: Request, exc: AuthenticationError):
     logger.error(f"AuthenticationError occurred: {str(exc)}")
     raise HTTPException(status_code=401, detail=str(exc))
 
+
 @app.exception_handler(AuthorizationError)
 async def authorization_error_exception_handler(_: Request, exc: AuthorizationError):
     logger.error(f"AuthorizationError occurred: {str(exc)}")
     raise HTTPException(status_code=401, detail=str(exc))
 
+
 @app.get("/")
 async def root():
     logger.info("Root endpoint accessed.")
     return {"message": "Hello World"}
+
 
 if __name__ == "__main__":
     logger.info("Starting the application...")

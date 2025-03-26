@@ -9,6 +9,7 @@ from app.utils.permissions import Permission
 logger = logging.getLogger(__name__)
 waste_router = APIRouter()
 
+
 def construct_waste_entries_data(waste_entries):
     """Helper function to construct JSON response data from waste entries."""
     return [
@@ -22,13 +23,14 @@ def construct_waste_entries_data(waste_entries):
         for entry in waste_entries
     ]
 
+
 @waste_router.post("/waste")
 @authorization_service.require_permission(Permission.CREATE_WASTE)
 async def create_waste(
-        _: Request,
-        type: str = Body(...),
-        weight: float = Body(...),
-        user_id: int = Body(...),
+    _: Request,
+    type: str = Body(...),
+    weight: float = Body(...),
+    user_id: int = Body(...),
 ) -> JSONResponse:
     logger.info(f"Attempting to create waste entry with type: {type}, weight: {weight}, user_id: {user_id}")
 
