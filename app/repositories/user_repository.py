@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from app.models.users import User, UserRole
 from app.repositories import Repository
+from app.utils import cache
+from app.utils.cache import set_value
 from app.utils.db import execute, fetch, fetchrow
 
 
@@ -94,3 +96,49 @@ class UserRepository(AbstractUserRepository):
         if row:
             return User.from_dict(row)
         return None
+
+class CacheUserRepository(UserRepository):
+    async def create(self, user: User) -> User:
+        result = await super().create(user)
+        await set_value(f"user:{result.id}", result.to_dict())
+        return result
+
+    async def read(self, user_id: int) -> Optional[User]:
+        cache_key = f"user:{user_id}"
+        cached_data = await cache.get_value(cache_key)
+        if cached_data is not None:
+            return User.from_dict(cached_data)
+        else:
+            result = await super().read(user_id)
+            if result:
+                await set_value(cache_key, result.to_dict())
+            return result
+
+    async def delete(self, user_id: int) -> None:
+        user = await self.read(user_id)
+        await super().delete(user.id)
+        await cache.delete_key(f"user:{user.id}")
+        await cache.delete_key(f"users_by_team_id:{user.team_id}")
+        await cache.delete_key(f"users_by_username:{user.username}")
+
+    async def get_users_by_team_id(self, team_id: int) -> List[User]:
+        cache_key = f"users_by_team_id:{team_id}"
+        cached_data = await cache.get_value(cache_key)
+        if cached_data is not None:
+            return [User.from_dict(data) for data in cached_data]
+        else:
+            results = await super().get_users_by_team_id(team_id)
+            if results:
+                await set_value(cache_key, [result.to_dict() for result in results])
+            return results
+
+    async def get_user_by_username(self, username: str) -> Optional[User]:
+        cache_key = f"user_by_username:{username}"
+        cached_data = await cache.get_value(cache_key)
+        if cached_data is not None:
+            return User.from_dict(cached_data)
+        else:
+            result = await super().get_user_by_username(username)
+            if result:
+                await set_value(cache_key, result.to_dict())
+            return result

@@ -52,7 +52,7 @@ async def verify_authorization(current_user: User, permission: Permission, reque
                 f"User {current_user.id} does not have access to user {request_user_id}",
             )
 
-        if permission in [Permission.GET_WASTE_BY_TEAM_ID, Permission.GET_USERS_BY_TEAM_ID]:
+        if permission == Permission.GET_USERS_BY_TEAM_ID:
             request_team_id = request_data["team_id"]
             verify(
                 request_team_id == current_user.team_id,

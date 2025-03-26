@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from app.models.teams import Team
-from app.repositories.team_repository import TeamRepository
+from app.repositories.team_repository import TeamRepository, CacheTeamRepository
 from app.utils.db import get_db_pool
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def get_team_repo() -> AsyncIterator[TeamRepository]:
     async with get_db_pool().acquire() as conn:
-        yield TeamRepository(conn)  # type: ignore
+        # yield TeamRepository(conn)  # type: ignore
+        yield CacheTeamRepository(conn)  # type: ignore
 
 
 async def create_team(name: str) -> Team:

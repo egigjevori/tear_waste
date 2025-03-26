@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, List
 
 from app.models.waste import WasteEntry
-from app.repositories.waste_repository import WasteRepository
+from app.repositories.waste_repository import WasteRepository, CacheWasteRepository
 from app.services import team_service, user_service
 from app.utils.db import get_db_pool
 
@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def get_waste_repo() -> AsyncIterator[WasteRepository]:
     async with get_db_pool().acquire() as conn:
-        yield WasteRepository(conn)  # type: ignore
+        # yield WasteRepository(conn)  # type: ignore
+        yield CacheWasteRepository(conn)  # type: ignore
 
 
 async def create_waste(

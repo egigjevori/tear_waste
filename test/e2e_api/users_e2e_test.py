@@ -52,6 +52,6 @@ async def test_get_users_by_team_id(patch_get_db_pool_user_service, patch_get_db
 
     # Assert that the response body contains the expected message
     assert response.json() == [
-        {"email": "0testuser@example.com", "role": "Employee", "team_id": 1, "username": "testuser0"},
-        {"email": "1testuser@example.com", "role": "Employee", "team_id": 1, "username": "testuser1"},
+        {'id': 1,"email": "0testuser@example.com", "role": "Employee", "team_id": 1, "username": "testuser0"},
+        {'id': 2,"email": "1testuser@example.com", "role": "Employee", "team_id": 1, "username": "testuser1"},
     ]

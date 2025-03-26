@@ -17,7 +17,6 @@ def create_test_user() -> User:
     return user
 
 
-@pytest.mark.asyncio
 async def test_create_user(db_test_pool: asyncpg.Pool):
     # Arrange
     async with db_test_pool.acquire() as conn:
@@ -40,7 +39,6 @@ async def test_create_user(db_test_pool: asyncpg.Pool):
         assert row["team_id"] == created_user.team_id
 
 
-@pytest.mark.asyncio
 async def test_read_user(db_test_pool: asyncpg.Pool):
     # Arrange
     async with db_test_pool.acquire() as conn:
@@ -67,7 +65,6 @@ async def test_read_user(db_test_pool: asyncpg.Pool):
         assert read_user is None
 
 
-@pytest.mark.asyncio
 async def test_delete_user(db_test_pool: asyncpg.Pool):
     # Arrange
     async with db_test_pool.acquire() as conn:

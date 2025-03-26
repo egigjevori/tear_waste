@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, List, Optional
 
 from app.models.users import User, UserRole
-from app.repositories.user_repository import UserRepository
+from app.repositories.user_repository import UserRepository, CacheUserRepository
 from app.services import team_service
 from app.utils.db import get_db_pool
 
@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def get_user_repo() -> AsyncIterator[UserRepository]:
     async with get_db_pool().acquire() as conn:
-        yield UserRepository(conn)  # type: ignore
+        # yield UserRepository(conn)  # type: ignore
+        yield CacheUserRepository(conn)  # type: ignore
 
 
 async def create_user(

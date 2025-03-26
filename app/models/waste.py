@@ -33,10 +33,11 @@ class WasteEntry:
     @classmethod
     def from_dict(cls, data: dict) -> WasteEntry:
         """Create a WasteEntry instance from a dictionary."""
+        timestamp = datetime.fromisoformat(data['timestamp']) if isinstance(data['timestamp'], str) else data['timestamp']
         return cls(
             id=data.get('id'),
             type=data['type'],
             weight=data['weight'],
-            timestamp=datetime.fromisoformat(data['timestamp']),  # Convert ISO format string to datetime
+            timestamp=timestamp,  # Convert ISO format string to datetime
             user_id=data['user_id']
         )
