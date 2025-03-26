@@ -1,11 +1,13 @@
+import functools
 import time
 
 from starlette.responses import JSONResponse
 
-from app.models.users import User
+from app.models.users import User, UserRole
 from app.services import user_service
-from app.utils.jwt import create_jwt
+from app.utils.jwt import create_jwt, verify_jwt, JWTError
 from app.utils.password import hash_password, verify_password
+from app.utils.permissions import Permission
 
 
 class AuthenticationError(Exception):
@@ -36,3 +38,21 @@ async def authenticate(username: str, password: str) -> str:
 
     token = create_token(user)
     return token
+
+
+async def verify_authentication(token: str) -> User:
+    if not token or not token.startswith("Bearer "):
+        raise AuthenticationError("Invalid or missing Authorization header")
+    token = token.removeprefix("Bearer ").strip()
+    try:
+        payload = verify_jwt(token)
+        user = User(
+            id=payload["sub"],
+            username=payload["username"],
+            email=payload["email"],
+            team_id=payload["team_id"],
+            role=UserRole(payload["role"]),
+        )
+        return user
+    except JWTError as e:
+        raise AuthenticationError(str(e))

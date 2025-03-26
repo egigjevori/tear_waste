@@ -24,11 +24,11 @@ def create_test_user_data() -> dict:
     return user
 
 
-async def test_create_user(patch_get_db_pool_user_service, patch_get_db_pool_team_service, client):
+async def test_create_user(patch_get_db_pool_user_service, patch_get_db_pool_team_service, no_auth_client):
     # Send a POST request to the /user endpoint
-    response = await client.post("/teams", data={"name": "New Team"})
+    response = await no_auth_client.post("/teams", data={"name": "New Team"})
     assert response.status_code == 201
-    response = await client.post("/users", json=sample_user_data)
+    response = await no_auth_client.post("/users", json=sample_user_data)
 
     # Assert that the response status code is 201 (Created)
     assert response.status_code == 201
@@ -37,15 +37,15 @@ async def test_create_user(patch_get_db_pool_user_service, patch_get_db_pool_tea
     assert response.json() == {"message": "User created successfully"}
 
 
-async def test_get_users_by_team_id(patch_get_db_pool_user_service, patch_get_db_pool_team_service, client):
+async def test_get_users_by_team_id(patch_get_db_pool_user_service, patch_get_db_pool_team_service, no_auth_client):
     # Send a POST request to the /user endpoint
-    response = await client.post("/teams", data={"name": "New Team"})
+    response = await no_auth_client.post("/teams", data={"name": "New Team"})
     assert response.status_code == 201
-    response = await client.post("/users", json=create_test_user_data())
+    response = await no_auth_client.post("/users", json=create_test_user_data())
     assert response.status_code == 201
-    response = await client.post("/users", json=create_test_user_data())
+    response = await no_auth_client.post("/users", json=create_test_user_data())
     assert response.status_code == 201
-    response = await client.get("/users/by-team/1")
+    response = await no_auth_client.get("/users/by-team/1")
 
     # Assert that the response status code is 201 (Created)
     assert response.status_code == 200

@@ -14,7 +14,7 @@ def base64_url_encode(data):
 class JWTError(Exception):
     pass
 
-def create_jwt(payload) -> str:
+def create_jwt(payload: dict) -> str:
     # Create the Header
     header = {"alg": "HS256", "typ": "JWT"}
     header_json = json.dumps(header, separators=(",", ":")).encode()
@@ -32,7 +32,7 @@ def create_jwt(payload) -> str:
     # Combine all parts
     return f"{encoded_header}.{encoded_payload}.{encoded_signature}"
 
-def verify_jwt(token) -> dict:
+def verify_jwt(token: str) -> dict:
     try:
         # Split token into parts
         encoded_header, encoded_payload, encoded_signature = token.split(".")

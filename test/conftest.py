@@ -33,6 +33,17 @@ def event_loop(request):
 
 
 @pytest.fixture
+async def no_auth_client():
+    # Override the middleware to skip authentication
+    original_middleware = app.user_middleware
+    app.user_middleware = []
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        yield client
+
+    app.user_middleware = original_middleware
+
+
+@pytest.fixture
 async def client():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
@@ -192,6 +203,9 @@ class FakeWasteRepository(AbstractWasteRepository):
             del self.entries[entry_id]
 
     async def get_waste_by_user_id(self, user_id: int) -> List[WasteEntry]:
+        pass
+
+    async def get_waste_by_team_id(self, team_id: int) -> List[WasteEntry]:
         pass
 
 
