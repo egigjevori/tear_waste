@@ -69,7 +69,9 @@ async def initdb(pool: asyncpg.Pool):
             );
         """
         )
-        # TODO add indexes
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_waste_entries_user_id ON waste_entries (user_id);")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_users_team_id ON users (team_id);")
+        await conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users (username);")
 
 
 def get_db_pool() -> asyncpg.pool.Pool:
