@@ -3,22 +3,24 @@ import asyncio
 import os
 from asyncio import AbstractEventLoop
 from contextlib import asynccontextmanager
-from typing import AsyncIterator, List, Optional, Iterator, Dict
-from unittest.mock import patch
+from functools import wraps
+from typing import AsyncIterator, List, Optional, Iterator, Dict, Callable
+from unittest.mock import patch, AsyncMock
 
 import asyncpg
 import pytest
 from dotenv import load_dotenv
 from httpx import AsyncClient, ASGITransport
 
-from app.main import app
+
 from app.models.teams import Team
-from app.models.users import User
+from app.models.users import User, UserRole
 from app.models.waste import WasteEntry
 from app.repositories.team_repository import AbstractTeamRepository
 from app.repositories.user_repository import AbstractUserRepository
 from app.repositories.waste_repository import AbstractWasteRepository
 from app.utils.db import initdb
+from app.utils.permissions import Permission
 
 # Load environment variables from a .env file
 load_dotenv(dotenv_path=".env.test")
@@ -35,12 +37,20 @@ def event_loop(request):
 @pytest.fixture
 async def no_auth_client():
     # Override the middleware to skip authentication
-    original_middleware = app.user_middleware
-    app.user_middleware = []
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        yield client
 
-    app.user_middleware = original_middleware
+    def require_permission(required_permission: Permission):
+        def decorator(func: Callable):
+            @wraps(func)
+            async def wrapper(*args, **kwargs):
+                return await func(*args, **kwargs)
+            return wrapper
+        return decorator
+
+    with patch("app.services.authorization_service.require_permission", require_permission):
+        from app.main import app
+        app.user_middleware = []
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            yield client
 
 
 @pytest.fixture
@@ -219,3 +229,4 @@ async def get_waste_repo() -> AsyncIterator[AbstractWasteRepository]:
 def get_waste_repo_mock():
     with patch("app.services.waste_service.get_waste_repo", wraps=get_waste_repo) as mock_repo:
         yield mock_repo
+

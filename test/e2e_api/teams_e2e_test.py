@@ -1,5 +1,3 @@
-from fastapi.testclient import TestClient
-from app.main import app
 
 
 async def test_create_team(patch_get_db_pool_team_service, no_auth_client):

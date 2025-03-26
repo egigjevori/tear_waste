@@ -6,13 +6,16 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 from app.models.users import User
-from app.services import team_service, user_service
+from app.services import team_service, user_service, authorization_service
 from fastapi import APIRouter
+
+from app.utils.permissions import Permission
 
 user_router = APIRouter()
 
 
 @user_router.post("/users")
+@authorization_service.require_permission(Permission.CREATE_USER)
 async def create_user(
     request: Request,
     username: str = Body(...),
@@ -26,6 +29,7 @@ async def create_user(
 
 
 @user_router.get("/users/by-team/{team_id}")
+@authorization_service.require_permission(Permission.GET_USERS_BY_TEAM_ID)
 async def get_users_by_team_id(request: Request, team_id: int):
     users = await user_service.get_users_by_team_id(team_id=team_id)
     users = [

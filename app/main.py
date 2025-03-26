@@ -9,6 +9,7 @@ from app.routes.user_routes import user_router
 from app.routes.waste_routes import waste_router
 from app.services import authentication_service
 from app.services.authentication_service import AuthenticationError
+from app.services.authorization_service import AuthorizationError
 from app.utils import db
 from app.utils.jwt import JWTError
 
@@ -41,12 +42,19 @@ async def authentication(request: Request, call_next):
     response = await call_next(request)
     return response
 
+
 @app.exception_handler(ValueError)
 async def value_error_exception_handler(_: Request, exc: ValueError):
     raise HTTPException(status_code=400, detail=str(exc))
 
+
 @app.exception_handler(AuthenticationError)
 async def authentication_error_exception_handler(_: Request, exc: AuthenticationError):
+    raise HTTPException(status_code=401, detail=str(exc))
+
+
+@app.exception_handler(AuthorizationError)
+async def authorization_error_exception_handler(_: Request, exc: AuthorizationError):
     raise HTTPException(status_code=401, detail=str(exc))
 
 
@@ -57,3 +65,6 @@ async def root():
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8080)
+
+#TODO rate limit
+#TODO add cache

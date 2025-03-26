@@ -5,13 +5,16 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 from app.models.waste import WasteEntry
-from app.services import team_service, waste_service
+from app.services import team_service, waste_service, authorization_service
 from fastapi import APIRouter
+
+from app.utils.permissions import Permission
 
 waste_router = APIRouter()
 
 
 @waste_router.post("/waste")
+@authorization_service.require_permission(Permission.CREATE_WASTE)
 async def create_waste(
     request: Request,
     type: str = Body(...),
@@ -23,6 +26,7 @@ async def create_waste(
 
 
 @waste_router.get("/waste/user/{user_id}")
+@authorization_service.require_permission(Permission.GET_WASTE_BY_USER_ID)
 async def get_waste_by_user_id(request: Request, user_id: int) -> JSONResponse:
     waste_entries = await waste_service.get_waste_by_user_id(user_id)
 
@@ -41,6 +45,7 @@ async def get_waste_by_user_id(request: Request, user_id: int) -> JSONResponse:
     return JSONResponse(content=waste_entries_data, status_code=status.HTTP_200_OK)
 
 @waste_router.get("/waste/team/{team_id}")
+@authorization_service.require_permission(Permission.GET_WASTE_BY_TEAM_ID)
 async def get_waste_by_team_id(request: Request, team_id: int) -> JSONResponse:
     #TODO if logged in user is manager, check for access to team
     waste_entries = await waste_service.get_waste_by_team_id(team_id)
