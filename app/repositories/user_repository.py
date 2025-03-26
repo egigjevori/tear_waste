@@ -61,14 +61,7 @@ class UserRepository(AbstractUserRepository):
         """
         row = await fetchrow(self.conn, query, user_id)
         if row:
-            return User(
-                id=row["id"],
-                username=row["username"],
-                email=row["email"],
-                team_id=row["team_id"],
-                role=UserRole(row["role"]),
-                password_hash=row["password_hash"],
-            )
+            return User.from_dict(row)
         return None
 
     async def delete(self, user_id: int) -> None:
@@ -86,14 +79,7 @@ class UserRepository(AbstractUserRepository):
         """
         rows = await fetch(self.conn, query, team_id)
         users = [
-            User(
-                id=row["id"],
-                username=row["username"],
-                email=row["email"],
-                team_id=row["team_id"],
-                role=UserRole(row["role"]),
-                password_hash=row["password_hash"],
-            )
+            User.from_dict(row)
             for row in rows
         ]
         return users
@@ -106,12 +92,5 @@ class UserRepository(AbstractUserRepository):
         """
         row = await fetchrow(self.conn, query, username)
         if row:
-            return User(
-                id=row["id"],
-                username=row["username"],
-                email=row["email"],
-                team_id=row["team_id"],
-                role=UserRole(row["role"]),
-                password_hash=row["password_hash"],
-            )
+            return User.from_dict(row)
         return None

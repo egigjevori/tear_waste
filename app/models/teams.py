@@ -9,5 +9,17 @@ class Team:
         self.name = name
         self.id = id
 
-    def __repr__(self):
-        return f"Team(id={self.id}, name='{self.name}')"
+    def to_dict(self) -> dict:
+        """Convert the Team instance to a dictionary."""
+        return {
+            'name': self.name,
+            'id': self.id
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> Team:
+        """Create a Team instance from a dictionary."""
+        return cls(
+            name=data.get('name'),
+            id=data.get('id')
+        )

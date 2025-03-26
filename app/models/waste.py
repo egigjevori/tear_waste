@@ -20,8 +20,23 @@ class WasteEntry:
         self.timestamp = timestamp
         self.user_id = user_id
 
-    def __repr__(self):
-        return (
-            f"WasteEntry(id={self.id}, type='{self.type}', weight={self.weight}, "
-            f"timestamp={self.timestamp}, user_id={self.user_id})"
+    def to_dict(self) -> dict:
+        """Convert the WasteEntry instance to a dictionary."""
+        return {
+            'id': self.id,
+            'type': self.type,
+            'weight': self.weight,
+            'timestamp': self.timestamp.isoformat(),  # Convert datetime to ISO format string
+            'user_id': self.user_id
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> WasteEntry:
+        """Create a WasteEntry instance from a dictionary."""
+        return cls(
+            id=data.get('id'),
+            type=data['type'],
+            weight=data['weight'],
+            timestamp=datetime.fromisoformat(data['timestamp']),  # Convert ISO format string to datetime
+            user_id=data['user_id']
         )

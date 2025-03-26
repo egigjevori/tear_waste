@@ -60,13 +60,7 @@ class WasteRepository(AbstractWasteRepository):
         """
         row = await fetchrow(self.conn, query, entry_id)
         if row:
-            return WasteEntry(
-                id=row["id"],
-                type=row["type"],
-                weight=row["weight"],
-                timestamp=row["timestamp"],
-                user_id=row["user_id"],
-            )
+            return WasteEntry.from_dict(row)
         return None
 
     async def delete(self, entry_id: int) -> None:
@@ -89,13 +83,7 @@ class WasteRepository(AbstractWasteRepository):
     @staticmethod
     def _rows_to_entries(rows) -> List[WasteEntry]:
         return [
-            WasteEntry(
-                id=row["id"],
-                type=row["type"],
-                weight=row["weight"],
-                timestamp=row["timestamp"],
-                user_id=row["user_id"],
-            )
+            WasteEntry.from_dict(row)
             for row in rows
         ]
 
