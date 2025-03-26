@@ -8,7 +8,6 @@ class Permission(enum.Enum):
     # Waste routes
     CREATE_WASTE = "create_waste"
     GET_WASTE_BY_USER_ID = "get_waste_by_user_id"
-    GET_WASTE_BY_TEAM_ID = "get_waste_by_team_id"
 
     # User routes
     CREATE_USER = "create_user"
@@ -26,7 +25,6 @@ EMPLOYEE_PERMISSIONS: List[Permission] = [
 MANAGER_PERMISSIONS: List[Permission] = [
     Permission.CREATE_WASTE,
     Permission.GET_WASTE_BY_USER_ID,
-    Permission.GET_WASTE_BY_TEAM_ID,
     Permission.GET_USERS_BY_TEAM_ID,
 ]
 

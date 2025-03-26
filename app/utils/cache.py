@@ -6,7 +6,7 @@ import os
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-import redis
+import redis.asyncio as redis
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
@@ -26,17 +26,21 @@ async def get_cache() -> AsyncIterator[redis.Redis]:
         yield cache
 
 
-async def set_value(key: str, value: dict):
+async def set_value(key: str, value: dict | list[dict]):
     async with get_cache() as cache:
         # Serialize the dictionary to a JSON string
         json_value = json.dumps(value)
         await cache.set(key, json_value.encode('utf-8'))
 
 
-async def get_value(key: str) -> dict | None:
+async def get_value(key: str) -> dict | list[dict] | None:
     async with get_cache() as cache:
         value = await cache.get(key)
         if value is not None:
             # Deserialize the JSON string back to a dictionary
             return json.loads(value.decode('utf-8'))
         return None
+
+async def delete_key(key: str):
+    async with get_cache() as cache:
+        await cache.delete(key)
