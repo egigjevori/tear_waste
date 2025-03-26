@@ -45,17 +45,3 @@ async def get_waste_by_user_id(_: Request, user_id: int) -> JSONResponse:
     waste_entries_data = construct_waste_entries_data(waste_entries)
 
     return JSONResponse(content=waste_entries_data, status_code=status.HTTP_200_OK)
-
-
-@waste_router.get("/waste/team/{team_id}")
-@authorization_service.require_permission(Permission.GET_WASTE_BY_TEAM_ID)
-async def get_waste_by_team_id(_: Request, team_id: int) -> JSONResponse:
-    logger.info(f"Fetching waste entries for team_id: {team_id}")
-
-    waste_entries = await waste_service.get_waste_by_team_id(team_id)
-
-    logger.info(f"Found {len(waste_entries)} waste entries for team_id: {team_id}")
-
-    waste_entries_data = construct_waste_entries_data(waste_entries)
-
-    return JSONResponse(content=waste_entries_data, status_code=status.HTTP_200_OK)

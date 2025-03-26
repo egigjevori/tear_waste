@@ -42,23 +42,3 @@ async def test_get_waste_by_user_id(
     # Assert that the response body contains the expected message
     assert response.json() == [{"id": 1, "timestamp": ANY, "type": "trash", "user_id": 1, "weight": 3.4}]
 
-
-async def test_get_waste_by_team_id(
-    patch_get_db_pool_waste_service, patch_get_db_pool_user_service, patch_get_db_pool_team_service, no_auth_client
-):
-    # Send a POST request to the /user endpoint
-    response = await no_auth_client.post("/teams", data={"name": "New Team"})
-    assert response.status_code == 201
-    response = await no_auth_client.post("/users", json=create_test_user_data())
-
-    response = await no_auth_client.post("/waste", json=sample_waste_data)
-    assert response.status_code == 201
-
-    assert response.status_code == 201
-    response = await no_auth_client.get("/waste/team/1")
-
-    # Assert that the response status code is 201 (Created)
-    assert response.status_code == 200
-
-    # Assert that the response body contains the expected message
-    assert response.json() == [{"id": 1, "timestamp": ANY, "type": "trash", "user_id": 1, "weight": 3.4}]

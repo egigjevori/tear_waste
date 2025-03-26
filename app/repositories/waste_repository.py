@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from app.models.waste import WasteEntry
 from app.repositories import Repository
+from app.utils import cache
 from app.utils.db import execute, fetch, fetchrow
 
 
@@ -25,11 +26,6 @@ class AbstractWasteRepository(Repository):
 
     @abstractmethod
     async def get_waste_by_user_id(self, user_id: int) -> List[WasteEntry]:
-        """Delete a waste entry by its ID."""
-        raise NotImplementedError
-
-    @abstractmethod
-    async def get_waste_by_team_id(self, team_id: int) -> List[WasteEntry]:
         """Delete a waste entry by its ID."""
         raise NotImplementedError
 
@@ -87,14 +83,38 @@ class WasteRepository(AbstractWasteRepository):
             for row in rows
         ]
 
-    async def get_waste_by_team_id(self, team_id: int) -> List[WasteEntry]:
-        query = """
-        SELECT *
-        FROM waste_entries
-        WHERE user_id IN (
-            SELECT id FROM users WHERE team_id = $1
-        )
-        """
-        rows = await fetch(self.conn, query, team_id)
-        waste_entries = self._rows_to_entries(rows)
-        return waste_entries
+class CacheWasteRepository(WasteRepository):
+    async def create(self, waste_entry: WasteEntry) -> WasteEntry:
+        result = await super().create(waste_entry)
+        await cache.set_value(f"waste:{result.id}", result.to_dict())
+        return result
+
+    async def read(self, entry_id: int) -> Optional[WasteEntry]:
+        cache_key = f"waste:{entry_id}"
+        cached_data = await cache.get_value(cache_key)
+        if cached_data is not None:
+            return WasteEntry.from_dict(cached_data)
+        else:
+            result = await super().read(entry_id)
+            if result:
+                await cache.set_value(cache_key, result.to_dict())
+            return result
+
+    async def delete(self, entry_id: int) -> None:
+        entry = await self.read(entry_id)
+        await super().delete(entry_id)
+        await cache.delete_key(f"waste:{entry_id}")
+        await cache.delete_key(f"waste_by_user_id:{entry.user_id}")
+        team_id = await self._get_team_id(entry.user_id)
+        await cache.delete_key(f"waste_by_team_id:{entry.user_id}")
+
+    async def get_waste_by_user_id(self, user_id: int) -> List[WasteEntry]:
+        cache_key = f"waste_by_user_id:{user_id}"
+        cached_data = await cache.get_value(cache_key)
+        if cached_data is not None:
+            return [WasteEntry.from_dict(data) for data in cached_data]
+        else:
+            results = await super().get_waste_by_user_id(user_id)
+            if results:
+                await cache.set_value(cache_key, [result.to_dict() for result in results])
+            return results
