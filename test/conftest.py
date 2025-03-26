@@ -106,7 +106,6 @@ def patch_get_db_pool_waste_service(db_test_pool):
         yield
 
 
-# TODO improve with hashmap
 class FakeTeamRepository(AbstractTeamRepository):
     def __init__(self, _):
         self.teams = []

@@ -20,7 +20,6 @@ async def create_user(
     team_id: int,
     password: str,
 ) -> User:
-    # TODO validate data
     await team_service.assert_team_exists(team_id=team_id)
     user = User(
         username=username,
