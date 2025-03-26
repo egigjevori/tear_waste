@@ -43,12 +43,6 @@ async def get_users_by_team_id(_: Request, team_id: int):
     logger.info(f"Found {len(users)} users for team_id: {team_id}")
 
     users_dict = [
-        {
-            "username": user.username,
-            "email": user.email,
-            "role": user.role.value,
-            "team_id": user.team_id,
-        }
-        for user in users
+        user.to_dict(sensitive=True) for user in users
     ]
     return JSONResponse(users_dict, status_code=status.HTTP_200_OK)
