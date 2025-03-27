@@ -17,7 +17,7 @@ user_router = APIRouter()
 @user_router.post("/users")
 @authorization_service.require_permission(Permission.CREATE_USER)
 async def create_user(
-    _: Request,
+    request: Request,
     username: str = Body(...),
     email: str = Body(...),
     role: str = Body(...),
@@ -36,7 +36,7 @@ async def create_user(
 
 @user_router.get("/users/by-team/{team_id}")
 @authorization_service.require_permission(Permission.GET_USERS_BY_TEAM_ID)
-async def get_users_by_team_id(_: Request, team_id: int):
+async def get_users_by_team_id(request: Request, team_id: int):
     logger.info(f"Fetching users for team_id: {team_id}")
 
     users = await user_service.get_users_by_team_id(team_id=team_id)

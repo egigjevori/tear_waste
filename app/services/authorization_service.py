@@ -5,7 +5,7 @@ from typing import Callable
 from fastapi import Request
 
 from app.models.users import User, UserRole
-from app.services import user_service
+from app.services import user_service, authentication_service
 from app.utils.permissions import ROLE_PERMISSIONS, Permission
 
 logger = logging.getLogger(__name__)
@@ -67,6 +67,11 @@ def require_permission(required_permission: Permission):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             request: Request = kwargs.get("request")
+            if "Authorization" not in request.headers:
+                raise AuthorizationError("No authorization header provided")
+            token = request.headers.get("Authorization")
+            user = await authentication_service.verify_authentication(token)
+            logger.info(f"User authenticated: {user}")
             await verify_authorization(request.state.user, required_permission, kwargs)
             return await func(*args, **kwargs)
 

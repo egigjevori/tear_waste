@@ -13,7 +13,7 @@ authentication_router = APIRouter()
 
 @authentication_router.post("/login")
 async def login(
-    _: Request,
+    request: Request,
     username: str = Body(...),
     password: str = Body(...),
 ) -> JSONResponse:

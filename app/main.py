@@ -9,7 +9,6 @@ from app.routes.authentication_routes import authentication_router
 from app.routes.team_routes import team_router
 from app.routes.user_routes import user_router
 from app.routes.waste_routes import waste_router
-from app.services import authentication_service
 from app.services.authentication_service import AuthenticationError
 from app.services.authorization_service import AuthorizationError
 from app.utils import db
@@ -61,26 +60,6 @@ app.include_router(team_router)
 app.include_router(user_router)
 app.include_router(waste_router)
 
-
-@app.middleware("authentication")
-async def authentication(request: Request, call_next):
-    logger.info(f"Authenticating request for path: {request.url.path}")
-    if request.url.path == "/login":
-        return await call_next(request)
-
-    token = request.headers.get("Authorization")
-    try:
-        user = await authentication_service.verify_authentication(token)
-        request.state.user = user
-        logger.info(f"User authenticated: {user}")
-    except AuthenticationError as e:
-        logger.warning(f"Authentication failed: {str(e)}")
-        raise HTTPException(status_code=401, detail="Authentication failed")
-
-    response = await call_next(request)
-    return response
-
-
 @app.exception_handler(ValueError)
 async def value_error_exception_handler(_: Request, exc: ValueError):
     logger.error(f"ValueError occurred: {str(exc)}")
@@ -104,9 +83,12 @@ async def root():
     logger.info("Root endpoint accessed.")
     return {"message": "Hello World"}
 
-
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host="localhost", port=8000)
 # TODO rate limit
 # TODO add comments
 # TODO unify responses
 # TODO TEST load
 # TODO openapi
+# TODO create admin user

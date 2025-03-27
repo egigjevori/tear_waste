@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from fastapi import HTTPException
 from starlette import status
 
+from app.utils.password import hash_password
+
 logger = logging.getLogger(__name__)
 load_dotenv()
 
@@ -15,6 +17,7 @@ DATABASE_URL = (
     f"postgresql://{os.getenv('POSTGRES_USER')}"
     f":{os.getenv('POSTGRES_PASSWORD')}"
     f"@{os.getenv('POSTGRES_HOST')}"
+    f":{os.getenv('POSTGRES_PORT')}"
     f"/{os.getenv('POSTGRES_DB')}"
 )
 
@@ -79,6 +82,29 @@ async def initdb(pool: asyncpg.Pool):
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_waste_entries_user_id ON waste_entries (user_id);")
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_users_team_id ON users (team_id);")
         await conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users (username);")
+        await conn.execute("""
+            INSERT INTO teams (name)
+            SELECT 'Admin'
+            WHERE NOT EXISTS (
+                SELECT 1 FROM teams WHERE name = 'Admin'
+            );
+        """)
+        existing_user = await conn.fetchrow(
+            """
+            SELECT id FROM users WHERE username = $1
+            """,
+            "admin"
+        )
+        if not existing_user:
+            user_id = await conn.fetchval(
+                """
+                INSERT INTO users (username, email, role, password_hash, team_id)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING id
+                """,
+                "admin", "admin@example.com", "Admin", hash_password("admin"), 1
+            )
+            logger.info(f"Inserted new admin user")
     logger.info("Database initialized")
 
 

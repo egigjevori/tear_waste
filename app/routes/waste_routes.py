@@ -19,7 +19,7 @@ def construct_waste_entries_data(waste_entries):
 @waste_router.post("/waste")
 @authorization_service.require_permission(Permission.CREATE_WASTE)
 async def create_waste(
-    _: Request,
+    request: Request,
     type: str = Body(...),
     weight: float = Body(...),
     user_id: int = Body(...),
@@ -34,7 +34,7 @@ async def create_waste(
 
 @waste_router.get("/waste/user/{user_id}")
 @authorization_service.require_permission(Permission.GET_WASTE_BY_USER_ID)
-async def get_waste_by_user_id(_: Request, user_id: int) -> JSONResponse:
+async def get_waste_by_user_id(request: Request, user_id: int) -> JSONResponse:
     logger.info(f"Fetching waste entries for user_id: {user_id}")
 
     waste_entries = await waste_service.get_waste_by_user_id(user_id)
