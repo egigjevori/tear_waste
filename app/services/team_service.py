@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from app.models.teams import Team
-from app.repositories.team_repository import TeamRepository, CacheTeamRepository
+from app.repositories.team_repository import CacheTeamRepository, TeamRepository
 from app.utils.db import get_db_pool
 
 logger = logging.getLogger(__name__)

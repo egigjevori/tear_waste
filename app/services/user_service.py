@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, List, Optional
 
 from app.models.users import User, UserRole
-from app.repositories.user_repository import UserRepository, CacheUserRepository
+from app.repositories.user_repository import CacheUserRepository, UserRepository
 from app.services import team_service
 from app.utils.db import get_db_pool
 

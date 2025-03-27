@@ -2,7 +2,7 @@ import asyncpg
 import pytest
 
 from app.models.users import User, UserRole
-from app.repositories.user_repository import UserRepository, CacheUserRepository
+from app.repositories.user_repository import CacheUserRepository, UserRepository
 
 
 def create_test_user() -> User:
@@ -109,6 +109,7 @@ async def test_get_users_by_team_id(db_test_pool: asyncpg.Pool):
         users = await repo.get_users_by_team_id(9999)  # Assuming 9999 is a non-existent team_id
         assert len(users) == 0
 
+
 async def test_get_users_by_team_id_cache(db_test_pool: asyncpg.Pool):
     # Arrange
     async with db_test_pool.acquire() as conn:
@@ -135,4 +136,3 @@ async def test_get_users_by_team_id_cache(db_test_pool: asyncpg.Pool):
         # Assert
         assert len(users) == 1
         assert any(u.id == created_user2.id for u in users)
-

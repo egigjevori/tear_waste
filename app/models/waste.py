@@ -23,21 +23,23 @@ class WasteEntry:
     def to_dict(self) -> dict:
         """Convert the WasteEntry instance to a dictionary."""
         return {
-            'id': self.id,
-            'type': self.type,
-            'weight': self.weight,
-            'timestamp': self.timestamp.isoformat(),  # Convert datetime to ISO format string
-            'user_id': self.user_id
+            "id": self.id,
+            "type": self.type,
+            "weight": self.weight,
+            "timestamp": self.timestamp.isoformat(),  # Convert datetime to ISO format string
+            "user_id": self.user_id,
         }
 
     @classmethod
     def from_dict(cls, data: dict) -> WasteEntry:
         """Create a WasteEntry instance from a dictionary."""
-        timestamp = datetime.fromisoformat(data['timestamp']) if isinstance(data['timestamp'], str) else data['timestamp']
+        timestamp = (
+            datetime.fromisoformat(data["timestamp"]) if isinstance(data["timestamp"], str) else data["timestamp"]
+        )
         return cls(
-            id=data.get('id'),
-            type=data['type'],
-            weight=data['weight'],
+            id=data.get("id"),
+            type=data["type"],
+            weight=data["weight"],
             timestamp=timestamp,  # Convert ISO format string to datetime
-            user_id=data['user_id']
+            user_id=data["user_id"],
         )

@@ -41,4 +41,3 @@ async def test_get_waste_by_user_id(
 
     # Assert that the response body contains the expected message
     assert response.json() == [{"id": 1, "timestamp": ANY, "type": "trash", "user_id": 1, "weight": 3.4}]
-

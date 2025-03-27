@@ -1,4 +1,5 @@
 import logging
+
 from fastapi import APIRouter, Body, Request
 from starlette import status
 from starlette.responses import JSONResponse
@@ -12,9 +13,7 @@ waste_router = APIRouter()
 
 def construct_waste_entries_data(waste_entries):
     """Helper function to construct JSON response data from waste entries."""
-    return [
-        entry.to_dict() for entry in waste_entries
-    ]
+    return [entry.to_dict() for entry in waste_entries]
 
 
 @waste_router.post("/waste")

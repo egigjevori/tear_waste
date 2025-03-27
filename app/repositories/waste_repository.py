@@ -78,10 +78,8 @@ class WasteRepository(AbstractWasteRepository):
 
     @staticmethod
     def _rows_to_entries(rows) -> List[WasteEntry]:
-        return [
-            WasteEntry.from_dict(row)
-            for row in rows
-        ]
+        return [WasteEntry.from_dict(row) for row in rows]
+
 
 class CacheWasteRepository(WasteRepository):
     async def create(self, waste_entry: WasteEntry) -> WasteEntry:

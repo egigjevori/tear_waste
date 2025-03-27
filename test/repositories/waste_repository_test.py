@@ -3,7 +3,7 @@ from datetime import datetime
 import asyncpg
 
 from app.models.waste import WasteEntry
-from app.repositories.waste_repository import WasteRepository, CacheWasteRepository
+from app.repositories.waste_repository import CacheWasteRepository, WasteRepository
 
 
 async def test_create_waste_entry(db_test_pool: asyncpg.Pool):
@@ -77,6 +77,7 @@ async def test_delete_waste_entry(db_test_pool: asyncpg.Pool):
         # Verify the entry no longer exists in the database
         row = await conn.fetchrow("SELECT * FROM waste_entries WHERE id = $1", created_entry.id)
         assert row is None
+
 
 async def test_delete_waste_entry_cache(db_test_pool: asyncpg.Pool):
     # Arrange

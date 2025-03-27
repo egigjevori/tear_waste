@@ -1,4 +1,5 @@
 import logging
+
 from fastapi import APIRouter, Body, Request
 from starlette import status
 from starlette.responses import JSONResponse
@@ -42,7 +43,5 @@ async def get_users_by_team_id(_: Request, team_id: int):
 
     logger.info(f"Found {len(users)} users for team_id: {team_id}")
 
-    users_dict = [
-        user.to_dict(sensitive=True) for user in users
-    ]
+    users_dict = [user.to_dict(sensitive=True) for user in users]
     return JSONResponse(users_dict, status_code=status.HTTP_200_OK)

@@ -2,7 +2,6 @@ import logging
 import uuid
 from contextlib import asynccontextmanager
 
-import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -107,5 +106,7 @@ async def root():
 
 
 # TODO rate limit
-# TODO add cache
+# TODO add comments
+# TODO unify responses
+# TODO TEST load
 # TODO openapi

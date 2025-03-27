@@ -1,12 +1,9 @@
 from abc import abstractmethod
 from typing import Optional
 
-from mypy.reachability import assert_will_always_fail
-
 from app.models.teams import Team  # Assuming you have a Team model defined
 from app.repositories import Repository
 from app.utils import cache
-from app.utils.cache import get_value, set_value
 from app.utils.db import fetchrow
 
 
@@ -47,6 +44,7 @@ class TeamRepository(AbstractTeamRepository):
         if row:
             return Team.from_dict(row)
         return None
+
 
 class CacheTeamRepository(TeamRepository):
 

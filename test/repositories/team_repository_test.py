@@ -2,7 +2,7 @@ import asyncpg
 import pytest
 
 from app.models.teams import Team
-from app.repositories.team_repository import TeamRepository, CacheTeamRepository
+from app.repositories.team_repository import CacheTeamRepository, TeamRepository
 
 
 async def test_create_team(db_test_pool: asyncpg.Pool):

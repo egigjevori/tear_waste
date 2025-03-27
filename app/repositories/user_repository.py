@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import List, Optional
 
-from app.models.users import User, UserRole
+from app.models.users import User
 from app.repositories import Repository
 from app.utils import cache
 from app.utils.cache import set_value
@@ -80,10 +80,7 @@ class UserRepository(AbstractUserRepository):
         WHERE team_id = $1
         """
         rows = await fetch(self.conn, query, team_id)
-        users = [
-            User.from_dict(row)
-            for row in rows
-        ]
+        users = [User.from_dict(row) for row in rows]
         return users
 
     async def get_user_by_username(self, username: str) -> Optional[User]:
@@ -97,10 +94,12 @@ class UserRepository(AbstractUserRepository):
             return User.from_dict(row)
         return None
 
+
 class CacheUserRepository(UserRepository):
     async def create(self, user: User) -> User:
         result = await super().create(user)
         await set_value(f"user:{result.id}", result.to_dict())
+        await cache.delete_key(f"users_by_team_id:{result.team_id}")
         return result
 
     async def read(self, user_id: int) -> Optional[User]:

@@ -46,6 +46,7 @@ async def test_manager_permission_denied(mock_user_service):
     with pytest.raises(AuthorizationError):
         await verify_authorization(user, Permission.GET_WASTE_BY_USER_ID, request_data)
 
+
 async def test_admin_permission_granted():
     user = User(id=1, role=UserRole.ADMIN, team_id=1, username="test", email="<EMAIL>")
     request_data = {"user_id": 1}

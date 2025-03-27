@@ -3,8 +3,8 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, List
 
 from app.models.waste import WasteEntry
-from app.repositories.waste_repository import WasteRepository, CacheWasteRepository
-from app.services import team_service, user_service
+from app.repositories.waste_repository import CacheWasteRepository, WasteRepository
+from app.services import user_service
 from app.utils.db import get_db_pool
 
 logger = logging.getLogger(__name__)
