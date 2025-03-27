@@ -12,6 +12,7 @@ from app.routes.waste_routes import waste_router
 from app.services.authentication_service import AuthenticationError
 from app.services.authorization_service import AuthorizationError
 from app.utils import db
+from app.utils.db import DatabaseError
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -76,6 +77,12 @@ async def authentication_error_exception_handler(_: Request, exc: Authentication
 async def authorization_error_exception_handler(_: Request, exc: AuthorizationError):
     logger.error(f"AuthorizationError occurred: {str(exc)}")
     raise HTTPException(status_code=401, detail=str(exc))
+
+
+@app.exception_handler(DatabaseError)
+async def database_error_exception_handler(_: Request, exc: DatabaseError):
+    logger.error(f"DatabaseError occurred: {str(exc)}")
+    raise HTTPException(status_code=400, detail=str(exc))
 
 
 @app.get("/")

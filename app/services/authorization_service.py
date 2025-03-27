@@ -72,7 +72,7 @@ def require_permission(required_permission: Permission):
             token = request.headers.get("Authorization")
             user = await authentication_service.verify_authentication(token)
             logger.info(f"User authenticated: {user}")
-            await verify_authorization(request.state.user, required_permission, kwargs)
+            await verify_authorization(user, required_permission, kwargs)
             return await func(*args, **kwargs)
 
         return wrapper

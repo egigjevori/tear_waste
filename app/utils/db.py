@@ -113,26 +113,26 @@ def get_db_pool() -> asyncpg.pool.Pool:
     return pool
 
 
+class DatabaseError(Exception):
+    pass
+
 def handle_errors(func):
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs):
         try:
-            result = func(*args, **kwargs)
+            result = await func(*args, **kwargs)
         except UniqueViolationError as e:
             logger.error(f"Unique violation error: {str(e)}")
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Unique constraint violated")
+            raise DatabaseError("Unique constraint violated")
         except ForeignKeyViolationError as e:
             logger.error(f"Foreign key violation error: {str(e)}")
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Referenced entity not found")
+            raise DatabaseError("Referenced entity not found")
         except PostgresSyntaxError as e:
             logger.error(f"SQL Syntax error: {str(e)}")
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="SQL syntax error")
+            raise DatabaseError("SQL syntax error")
         except Exception as e:
             logger.error(f"Unexpected error: {str(e)}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Unexpected error occurred",
-            )
+            raise DatabaseError("Unexpected error occurred")
 
         return result
 
