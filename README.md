@@ -16,7 +16,7 @@ Running this project requires **Docker** and **docker-compose** installed.
 3. Access [http://localhost:8000/docs](http://localhost:8000/docs)
 ---
 
-### Deploy using Minikube:
+### Deploy using Minikube (minikube already started):
 1. Run `docker build -t tearwaste .`
 2. Load local image to minikube `minikube image load tearwaste`
 3. Run `kubectl apply -f deployments/`
