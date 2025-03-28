@@ -90,12 +90,6 @@ async def root():
     logger.info("Root endpoint accessed.")
     return {"message": "Hello World"}
 
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(app, host="localhost", port=8000)
-# TODO rate limit
-# TODO add comments
-# TODO unify responses
-# TODO TEST load
-# TODO openapi
-# TODO create admin user
+# if __name__ == '__main__':
+#     import uvicorn
+#     uvicorn.run(app, host="localhost", port=8000)
