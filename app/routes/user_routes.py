@@ -7,7 +7,6 @@ from starlette.responses import JSONResponse
 from app.services import authorization_service, user_service
 from app.utils.permissions import Permission
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

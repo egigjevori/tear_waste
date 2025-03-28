@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
 
-from app.models.teams import Team  # Assuming you have a Team model defined
+from app.models.teams import Team
 from app.repositories import Repository
 from app.utils import cache
 from app.utils.db import fetchrow
@@ -10,12 +10,10 @@ from app.utils.db import fetchrow
 class AbstractTeamRepository(Repository):
     @abstractmethod
     async def create(self, team: Team) -> Team:
-        """Create a new team."""
         raise NotImplementedError
 
     @abstractmethod
     async def read(self, team_id: int) -> Optional[Team]:
-        """Read a team by its ID."""
         raise NotImplementedError
 
 

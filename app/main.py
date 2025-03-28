@@ -17,7 +17,6 @@ from app.utils.db import DatabaseError
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Add console handler for logging
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
 logger.addHandler(console_handler)
@@ -61,6 +60,7 @@ app.include_router(team_router)
 app.include_router(user_router)
 app.include_router(waste_router)
 
+
 @app.exception_handler(ValueError)
 async def value_error_exception_handler(_: Request, exc: ValueError):
     logger.error(f"ValueError occurred: {str(exc)}")
@@ -89,6 +89,7 @@ async def database_error_exception_handler(_: Request, exc: DatabaseError):
 async def root():
     logger.info("Root endpoint accessed.")
     return {"message": "Hello World"}
+
 
 # if __name__ == '__main__':
 #     import uvicorn

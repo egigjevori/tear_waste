@@ -11,22 +11,18 @@ class AbstractWasteRepository(Repository):
 
     @abstractmethod
     async def create(self, waste_entry: WasteEntry) -> WasteEntry:
-        """Create a new waste entry."""
         raise NotImplementedError
 
     @abstractmethod
     async def read(self, entry_id: int) -> Optional[WasteEntry]:
-        """Read a waste entry by its ID."""
         raise NotImplementedError
 
     @abstractmethod
     async def delete(self, entry_id: int) -> None:
-        """Delete a waste entry by its ID."""
         raise NotImplementedError
 
     @abstractmethod
     async def get_waste_by_user_id(self, user_id: int) -> List[WasteEntry]:
-        """Delete a waste entry by its ID."""
         raise NotImplementedError
 
 

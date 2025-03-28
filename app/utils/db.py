@@ -5,8 +5,6 @@ from functools import wraps
 import asyncpg
 from asyncpg import ForeignKeyViolationError, PostgresSyntaxError, UniqueViolationError
 from dotenv import load_dotenv
-from fastapi import HTTPException
-from starlette import status
 
 from app.utils.password import hash_password
 
@@ -82,29 +80,35 @@ async def initdb(pool: asyncpg.Pool):
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_waste_entries_user_id ON waste_entries (user_id);")
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_users_team_id ON users (team_id);")
         await conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users (username);")
-        await conn.execute("""
+        await conn.execute(
+            """
             INSERT INTO teams (name)
             SELECT 'Admin'
             WHERE NOT EXISTS (
                 SELECT 1 FROM teams WHERE name = 'Admin'
             );
-        """)
+        """
+        )
         existing_user = await conn.fetchrow(
             """
             SELECT id FROM users WHERE username = $1
             """,
-            "admin"
+            "admin",
         )
         if not existing_user:
-            user_id = await conn.fetchval(
+            _ = await conn.fetchval(
                 """
                 INSERT INTO users (username, email, role, password_hash, team_id)
                 VALUES ($1, $2, $3, $4, $5)
                 RETURNING id
                 """,
-                "admin", "admin@example.com", "Admin", hash_password("admin"), 1
+                "admin",
+                "admin@example.com",
+                "Admin",
+                hash_password("admin"),
+                1,
             )
-            logger.info(f"Inserted new admin user")
+            logger.info("Inserted new admin user")
     logger.info("Database initialized")
 
 
@@ -115,6 +119,7 @@ def get_db_pool() -> asyncpg.pool.Pool:
 
 class DatabaseError(Exception):
     pass
+
 
 def handle_errors(func):
     @wraps(func)

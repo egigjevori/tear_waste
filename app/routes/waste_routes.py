@@ -12,7 +12,6 @@ waste_router = APIRouter()
 
 
 def construct_waste_entries_data(waste_entries):
-    """Helper function to construct JSON response data from waste entries."""
     return [entry.to_dict() for entry in waste_entries]
 
 

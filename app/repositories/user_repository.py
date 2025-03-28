@@ -11,27 +11,22 @@ from app.utils.db import execute, fetch, fetchrow
 class AbstractUserRepository(Repository):
     @abstractmethod
     async def create(self, user: User) -> User:
-        """Create a new user."""
         raise NotImplementedError
 
     @abstractmethod
     async def read(self, user_id: int) -> Optional[User]:
-        """Read a user by their ID."""
         raise NotImplementedError
 
     @abstractmethod
     async def delete(self, user_id: int) -> None:
-        """Delete a user by their ID."""
         raise NotImplementedError
 
     @abstractmethod
     async def get_users_by_team_id(self, team_id: int) -> List[User]:
-        """Get users by their team id."""
         raise NotImplementedError
 
     @abstractmethod
     async def get_user_by_username(self, username: str) -> Optional[User]:
-        """Get users by their team id."""
         raise NotImplementedError
 
 
@@ -48,7 +43,7 @@ class UserRepository(AbstractUserRepository):
             query,
             user.username,
             user.email,
-            user.role.value,  # Assuming role is an instance of UserRole enum
+            user.role.value,
             user.password_hash,
             user.team_id,
         )
