@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tearwaste
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tearwaste
+  template:
+    metadata:
+      labels:
+        app: tearwaste
+    spec:
+      containers:
+        - name: tearwaste
+          image: tearwaste
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            # postgres database
+            - name: POSTGRES_PASSWORD
+              value: "postgres-password"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_DB
+              value: "postgres"
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: POSTGRES_PORT
+              value: "5432"
+
+            # secret hash password key
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tearwaste-secrets
+                  key: SECRET_KEY
+
+            # redis cache
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_DB
+              value: "0"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tearwaste
+spec:
+  selector:
+    app: tearwaste
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer
