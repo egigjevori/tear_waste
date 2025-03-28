@@ -35,20 +35,15 @@ app = FastAPI(lifespan=lifespan)
 
 class LogRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        # Generate a unique request ID
         request_id = str(uuid.uuid4())
 
-        # Add the request ID to the log context
         logger = logging.getLogger("uvicorn")
         logger.info(f"Request ID: {request_id} - {request.method} {request.url}")
 
-        # Store request ID in state for later use (e.g., in route handlers)
         request.state.request_id = request_id
 
-        # Proceed with the request and capture response
         response = await call_next(request)
 
-        # Log response with the same request ID
         logger.info(f"Request ID: {request_id} - Response Status: {response.status_code}")
         return response
 
@@ -89,8 +84,3 @@ async def database_error_exception_handler(_: Request, exc: DatabaseError):
 async def root():
     logger.info("Root endpoint accessed.")
     return {"message": "Hello World"}
-
-
-# if __name__ == '__main__':
-#     import uvicorn
-#     uvicorn.run(app, host="localhost", port=8000)

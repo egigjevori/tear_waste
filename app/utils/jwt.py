@@ -11,7 +11,6 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 
 
 def base64_url_encode(data):
-    """Encodes data to Base64 URL-safe format (without padding)."""
     return base64.urlsafe_b64encode(data).decode().rstrip("=")
 
 
