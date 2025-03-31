@@ -16,6 +16,10 @@ class AbstractTeamRepository(Repository):
     async def read(self, team_id: int) -> Optional[Team]:
         raise NotImplementedError
 
+    @abstractmethod
+    async def read_all(self) -> list[Team]:
+        raise NotImplementedError
+
 
 class TeamRepository(AbstractTeamRepository):
     async def create(self, team: Team) -> Team:
@@ -43,6 +47,14 @@ class TeamRepository(AbstractTeamRepository):
             return Team.from_dict(row)
         return None
 
+    async def read_all(self) -> list[Team]:
+        query = """
+        SELECT *
+        FROM teams
+        """
+        rows = await self.conn.fetch(query)
+        return [Team.from_dict(row) for row in rows]
+
 
 class CacheTeamRepository(TeamRepository):
 
@@ -61,3 +73,14 @@ class CacheTeamRepository(TeamRepository):
             if result:
                 await cache.set_value(cache_key, result.to_dict())
             return result
+
+    async def read_all(self) -> list[Team]:
+        # Attempt to retrieve all teams from cache
+        cached_teams = await cache.get_value("all_teams")
+        if cached_teams is not None:
+            return [Team.from_dict(team) for team in cached_teams]
+
+        # If not in cache, retrieve from database and cache the result
+        teams = await super().read_all()
+        await cache.set_value("all_teams", [team.to_dict() for team in teams])
+        return teams

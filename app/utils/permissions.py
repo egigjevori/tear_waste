@@ -15,6 +15,7 @@ class Permission(enum.Enum):
 
     # Team routes
     CREATE_TEAM = "create_team"
+    GET_ALL_TEAMS = "get_all_teams"
 
 
 EMPLOYEE_PERMISSIONS: List[Permission] = [

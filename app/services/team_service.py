@@ -48,3 +48,12 @@ async def assert_team_exists(team_id: int) -> None:
     if not team:
         logger.error(f"Team {team_id} does not exist")
         raise ValueError(f"Team {team_id} does not exist")
+
+
+async def get_all_teams() -> list[Team]:
+    logger.info("Fetching all teams")
+
+    async with get_team_repo() as repo:
+        teams = await repo.read_all()
+        logger.info(f"Retrieved {len(teams)} teams")
+        return teams

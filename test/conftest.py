@@ -71,7 +71,7 @@ async def db_test_pool() -> asyncpg.Pool:
     pool = await asyncpg.create_pool(
         user=os.getenv("POSTGRES_USER"),
         password=os.getenv("POSTGRES_PASSWORD"),
-        # database=os.getenv("POSTGRES_DB"),
+        database=os.getenv("POSTGRES_DB"),
         host=os.getenv("POSTGRES_HOST"),
         port=os.getenv("POSTGRES_PORT"),
         min_size=1,  # Minimum number of connections in the pool
@@ -108,6 +108,9 @@ class FakeTeamRepository(AbstractTeamRepository):
     def __init__(self, _):
         self.teams = []
         self.next_id = 1
+
+    async def read_all(self) -> list[Team]:
+        return self.teams
 
     async def create(self, team: Team) -> Team:
         team.id = self.next_id
