@@ -61,6 +61,7 @@ class CacheTeamRepository(TeamRepository):
     async def create(self, team: Team) -> Team:
         result = await super().create(team)
         await cache.set_value(f"team:{result.id}", result.to_dict())
+        await cache.delete_key("all_teams")
         return result
 
     async def read(self, team_id: int) -> Optional[Team]:
