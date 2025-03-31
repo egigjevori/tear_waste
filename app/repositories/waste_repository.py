@@ -81,6 +81,7 @@ class CacheWasteRepository(WasteRepository):
     async def create(self, waste_entry: WasteEntry) -> WasteEntry:
         result = await super().create(waste_entry)
         await cache.set_value(f"waste:{result.id}", result.to_dict())
+        await cache.delete_key(f"waste_by_user_id:{result.user_id}")
         return result
 
     async def read(self, entry_id: int) -> Optional[WasteEntry]:
