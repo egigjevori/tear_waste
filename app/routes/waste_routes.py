@@ -25,10 +25,10 @@ async def create_waste(
 ) -> JSONResponse:
     logger.info(f"Attempting to create waste entry with type: {type}, weight: {weight}, user_id: {user_id}")
 
-    await waste_service.create_waste(type, weight, user_id)
+    waste = await waste_service.create_waste(type, weight, user_id)
 
     logger.info(f"Waste entry created successfully for user_id: {user_id}")
-    return JSONResponse({"message": "Waste entry created successfully"}, status_code=status.HTTP_201_CREATED)
+    return JSONResponse(waste.to_dict(), status_code=status.HTTP_201_CREATED)
 
 
 @waste_router.get("/waste/user/{user_id}")

@@ -27,10 +27,10 @@ async def create_user(
         f"Attempting to create user with username: {username}, email: {email}, role: {role}, team_id: {team_id}"
     )
 
-    await user_service.create_user(username, email, role, team_id, password)
+    user = await user_service.create_user(username, email, role, team_id, password)
 
     logger.info(f"User '{username}' created successfully")
-    return JSONResponse({"message": "User created successfully"}, status_code=status.HTTP_201_CREATED)
+    return JSONResponse(user.to_dict(sensitive=True), status_code=status.HTTP_201_CREATED)
 
 
 @user_router.get("/users/by-team/{team_id}")

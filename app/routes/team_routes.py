@@ -15,6 +15,6 @@ team_router = APIRouter()
 @authorization_service.require_permission(Permission.CREATE_TEAM)
 async def create_team(request: Request, name: str = Body(..., embed=True)) -> JSONResponse:
     logger.info(f"Received request to create team with name: {name}")
-    await team_service.create_team(name)
+    team = await team_service.create_team(name)
     logger.info(f"Team '{name}' created successfully")
-    return JSONResponse({"message": "Team created successfully"}, status_code=status.HTTP_201_CREATED)
+    return JSONResponse(team.to_dict(), status_code=status.HTTP_201_CREATED)

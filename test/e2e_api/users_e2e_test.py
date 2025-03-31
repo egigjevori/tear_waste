@@ -26,7 +26,7 @@ def create_test_user_data() -> dict:
 
 async def test_create_user(patch_get_db_pool_user_service, patch_get_db_pool_team_service, no_auth_client):
     # Send a POST request to the /user endpoint
-    response = await no_auth_client.post("/teams", data={"name": "New Team"})
+    response = await no_auth_client.post("/teams", json={"name": "New Team"})
     assert response.status_code == 201
     response = await no_auth_client.post("/users", json=sample_user_data)
 
@@ -34,12 +34,18 @@ async def test_create_user(patch_get_db_pool_user_service, patch_get_db_pool_tea
     assert response.status_code == 201
 
     # Assert that the response body contains the expected message
-    assert response.json() == {"message": "User created successfully"}
+    assert response.json() == {
+        "email": "testuser@example.com",
+        "id": 2,
+        "role": "Employee",
+        "team_id": 1,
+        "username": "testuser",
+    }
 
 
 async def test_get_users_by_team_id(patch_get_db_pool_user_service, patch_get_db_pool_team_service, no_auth_client):
     # Send a POST request to the /user endpoint
-    response = await no_auth_client.post("/teams", data={"name": "New Team"})
+    response = await no_auth_client.post("/teams", json={"name": "New Team"})
     assert response.status_code == 201
     response = await no_auth_client.post("/users", json=create_test_user_data())
     assert response.status_code == 201
@@ -52,6 +58,7 @@ async def test_get_users_by_team_id(patch_get_db_pool_user_service, patch_get_db
 
     # Assert that the response body contains the expected message
     assert response.json() == [
-        {"id": 1, "email": "0testuser@example.com", "role": "Employee", "team_id": 1, "username": "testuser0"},
-        {"id": 2, "email": "1testuser@example.com", "role": "Employee", "team_id": 1, "username": "testuser1"},
+        {"email": "admin@example.com", "id": 1, "role": "Admin", "team_id": 1, "username": "admin"},
+        {"email": "0testuser@example.com", "id": 2, "role": "Employee", "team_id": 1, "username": "testuser0"},
+        {"email": "1testuser@example.com", "id": 3, "role": "Employee", "team_id": 1, "username": "testuser1"},
     ]

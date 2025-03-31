@@ -1,28 +1,24 @@
-# conftest.py
 import asyncio
 import os
-from asyncio import AbstractEventLoop
 from contextlib import asynccontextmanager
 from functools import wraps
-from typing import AsyncIterator, Callable, Dict, Iterator, List, Optional
-from unittest.mock import AsyncMock, patch
+from typing import AsyncIterator, Callable, Dict, List, Optional
+from unittest.mock import patch
 
 import asyncpg
 import pytest
 from dotenv import load_dotenv
 from httpx import ASGITransport, AsyncClient
 
+load_dotenv(dotenv_path="../.env.test", override=True)
 from app.models.teams import Team
-from app.models.users import User, UserRole
+from app.models.users import User
 from app.models.waste import WasteEntry
 from app.repositories.team_repository import AbstractTeamRepository
 from app.repositories.user_repository import AbstractUserRepository
 from app.repositories.waste_repository import AbstractWasteRepository
 from app.utils.db import initdb
 from app.utils.permissions import Permission
-
-# Load environment variables from a .env file
-load_dotenv(dotenv_path=".env.test")
 
 
 @pytest.yield_fixture(scope="session")
@@ -71,11 +67,13 @@ async def drop_tables(pool: asyncpg.Pool):
 @pytest.fixture
 async def db_test_pool() -> asyncpg.Pool:
     """Create an asyncpg connection pool."""
+    load_dotenv(dotenv_path="../.env.test", override=True)
     pool = await asyncpg.create_pool(
         user=os.getenv("POSTGRES_USER"),
         password=os.getenv("POSTGRES_PASSWORD"),
-        database=os.getenv("POSTGRES_DB"),
+        # database=os.getenv("POSTGRES_DB"),
         host=os.getenv("POSTGRES_HOST"),
+        port=os.getenv("POSTGRES_PORT"),
         min_size=1,  # Minimum number of connections in the pool
         max_size=10,  # Maximum number of connections in the pool
     )

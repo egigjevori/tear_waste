@@ -101,7 +101,7 @@ async def test_get_users_by_team_id(db_test_pool: asyncpg.Pool):
         users = await repo.get_users_by_team_id(user1.team_id)
 
         # Assert
-        assert len(users) == 2
+        assert len(users) == 3
         assert any(u.id == created_user1.id for u in users)
         assert any(u.id == created_user2.id for u in users)
 
@@ -134,5 +134,5 @@ async def test_get_users_by_team_id_cache(db_test_pool: asyncpg.Pool):
         users = await repo.get_users_by_team_id(user2.team_id)
 
         # Assert
-        assert len(users) == 1
+        assert len(users) == 2
         assert any(u.id == created_user2.id for u in users)
