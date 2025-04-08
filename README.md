@@ -1,74 +1,219 @@
-### Notes
-- The project uses minimal dependencies, only the FastApi library and the cache/database connectors (bcrypt and load env also).
-- The app supports a fine grained permission and role authorization system
-  - routes require permissions
-  - roles have multiple permissions
-  - users are assigned roles
+# TearWaste: A FastAPI Application
 
+TearWaste is a case study, scalable REST API built with FastAPI, featuring a layered architecture, comprehensive security model, and cloud-native deployment capabilities.
 
-# Project Setup
+## 1. Architecture Deep Dive
 
-Running this project requires **Docker** and **docker-compose** installed.
+### 1.1 Layered Architecture
 
-### To run the project:
-1. Rename `.env.example` to `.env`
-2. Run `docker-compose up --build`
-3. Access [http://localhost:8000/docs](http://localhost:8000/docs)
----
+Our application follows a clean layered architecture pattern, providing clear separation of concerns:
 
-### Deploy using Minikube (minikube already started):
-1. Run `docker build -t tearwaste .`
-2. Load local image to minikube `minikube image load tearwaste`
-3. Run `kubectl apply -f deployments/`
-4. Run `minikube service tearwaste --url`
----
+```
+┌─────────────────────────────────────────┐
+│            Presentation Layer           │
+│  (Routes, Request/Response Handling)    │
+└───────────────────┬─────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│         Authentication Layer            │
+│    (Token Validation, User Identity)    │
+└───────────────────┬─────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│          Authorization Layer            │
+│     (Permissions, Role Verification)    │
+└───────────────────┬─────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│      Service/Business Logic Layer       │
+│   (Domain Logic, Business Workflows)    │
+└───────────────────┬─────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│           Data Access Layer             │
+│     (Repositories, Cache, Database)     │
+└─────────────────────────────────────────┘
+```
 
-
-## API Architecture - Layered Architecture
-
-Layered architecture organizes code into horizontal layers, each with a specific responsibility, where higher layers depend on lower layers.
-
-### How The Project Implements Layered Architecture:
+#### Key Design Decisions:
 
 1. **Presentation Layer**
-   - Routes, controllers, request/response handling, input validation, exception handling.
+   - Routes definition
+   - Handles HTTP requests/responses
+   - Input validation
+   - Global exception handling for consistent error responses
 
-2. **Service/Business Logic Layer**
-   - Service modules containing domain logic (e.g., `authentication_service`, `authorization_service`)
-   - Business rules and workflows
+2. **Authentication Layer**
+   - JWT-based authentication
+   - Secure password hashing with bcrypt
+   - Token generation and validation
+
+3. **Authorization Layer**
+   - Fine-grained permission based authorization
+   - Routes require specific permissions
+   - Role-based access control
+   - Users are assigned roles
+   - Roles contain multiple permissions
+
+4. **Service/Business Logic Layer**
+   - Pure business logic isolated from infrastructure concerns
    - Domain-specific error types
+   - Implements core application workflows
 
-3. **Data Access Layer**
-   - Cache and database repositories
+5. **Data Access Layer**
+   - Repository pattern for database access
+   - Caching strategy with Redis
+   - Abstract interfaces allowing for different implementations
 
-### Benefits
+### 1.2 Repository Pattern Implementation
 
-- **Testability**: Services can be tested in isolation without HTTP or database dependencies.
-- **Flexibility**: You could replace FastAPI with another web framework with minimal changes to your core logic. Database technology could be swapped by implementing new repositories.
-- **Maintainability**: Clear separation of concerns makes the codebase easier to understand. Changes to one layer have minimal impact on others.
-- **Scalability**: Different layers can be scaled independently based on demand. Clear boundaries make it easier to refactor for performance.
-- **Evolvability**: New features can be added by extending existing layers without disrupting the overall architecture. The system can evolve over time while maintaining structural integrity.
+The application uses the Repository pattern to abstract data access:
 
----
+```python
+# Abstract base class defines the interface
+class AbstractUserRepository(Repository):
+    @abstractmethod
+    async def create(self, user: User) -> User:
+        raise NotImplementedError
+    
+    # Other methods...
 
-## Deployment Architecture
+# Concrete implementation for database access
+class UserRepository(AbstractUserRepository):
+    async def create(self, user: User) -> User:
+        # Database implementation...
+        
+# Enhanced implementation with caching
+class CacheUserRepository(UserRepository):
+    async def create(self, user: User) -> User:
+        # Adds caching on top of database operations
+        result = await super().create(user)
+        await set_value(f"user:{result.id}", result.to_dict())
+        # ...
+```
 
-The application follows a modern microservices deployment pattern in Kubernetes with these key components:
+This pattern provides:
+- **Testability**: Easy to mock for unit tests
+- **Flexibility**: Swap implementations without changing business logic
+- **Performance optimization**: Add caching without modifying core logic
 
-1. **Load Balancer (External)**
-   - Distributes incoming traffic across multiple API Gateway instances
+## 2. Deployment Architecture
+
+The application follows a modern microservices deployment pattern in Kubernetes:
+
+```
+                   ┌─────────────────┐
+                   │  Load Balancer  │
+                   └────────┬────────┘
+                            │
+                   ┌────────▼────────┐
+                   │   API Gateway   │
+                   └────────┬────────┘
+                            │
+          ┌─────────────────┼────────────────────┐
+          │                 │                    │
+┌─────────▼─────────┐ ┌─────▼──────────┐ ┌───────▼────────┐
+│  FastAPI Service  │ │ FastAPI Service│ │ FastAPI Service│
+│    (Replica 1)    │ │   (Replica 2)  │ │   (Replica N)  │
+└─────────┬─────────┘ └─────────┬──────┘ └───────┬────────┘
+          │                     │                │
+          └─────────┬───────────┼────────────────┘
+                    │           │
+          ┌─────────▼───┐ ┌─────▼─────────┐
+          │ Redis Cache │ │ PostgreSQL DB │
+          └─────────────┘ └───────────────┘
+```
+
+### Key Components:
+
+1. **Load Balancer**
+   - Distributes incoming traffic across API Gateway instances
 
 2. **API Gateway**
-   - Routing and rate limiting
+   - Handles routing and rate limiting
 
-3. **REST API Service (Multiple Replicas)**
-   - Our FastAPI application, easily scalable.
+3. **FastAPI Service (Multiple Replicas)**
+   - Stateless application instances that can scale horizontally
 
 4. **Redis Cache**
-   - Cache frequently accessed data to reduce database load
+   - Improves performance by caching frequently accessed data
+   - Reduces database load for read-heavy operations
 
 5. **PostgreSQL Database**
-   - Persistent data storage, easily scalable.
+   - Persistent storage for application data
+
+## 3. Benefits of This Architecture
+
+- **Testability**: Each layer can be tested in isolation
+- **Flexibility**: Components can be replaced with minimal impact
+- **Maintainability**: Clear boundaries make the codebase easier to understand
+- **Scalability**: Different components can scale independently
+- **Evolvability**: The system can evolve while maintaining structural integrity
+
+## 4. Development Process
+
+TearWaste follows a structured development process designed to maintain code quality and ensure reliability:
+
+### 4.1 Development Workflow
+
+```
+┌─────────────────────┐
+│  Design and         │
+│  Project Structure  │
+└──────────┬──────────┘
+           │
+           ▼
+┌──────────────────────────────────────────┐
+│                                          │
+│  ┌─────────────────┐     ┌─────────────┐ │
+│  │  Implementation │────▶│   Testing   │ │
+│  └────────┬────────┘     └──────┬──────┘ │
+│           │                     │        │
+│           └─────────────────────┘        │
+│             Iterative Process            │
+└──────────────────────────────────────────┘
+```
+
+### 4.2 Testing Strategy
+
+The project implements a comprehensive testing strategy:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      End-to-End Tests                       │
+│  (Test complete user flows through the entire application)  │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────────┐
+│                     Integration Tests                       │
+│    (Test interactions between multiple components)          │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────────┐
+│                       Unit Tests                            │
+│     (Test individual components in isolation)               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Test Categories:
+
+1. **Unit Tests**
+   - Repository tests with database mocks
+   - Service tests with repository mocks
+   - Pure function tests for utilities
+
+2. **Integration Tests**
+   - Repository tests with real database
+   - Service tests with real repositories
+   - Authentication flow tests
+
+3. **End-to-End Tests**
+   - Complete API flows testing
+   - Authentication and authorization testing
+   - Error handling and edge cases
 
 ---
-
